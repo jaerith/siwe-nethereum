@@ -1,0 +1,25 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "siwe_nethereum", "siwe_nethereum.csproj", "{EEEC6958-3E71-4A8E-B9E7-D6996D1E3913}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEEC6958-3E71-4A8E-B9E7-D6996D1E3913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEEC6958-3E71-4A8E-B9E7-D6996D1E3913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEEC6958-3E71-4A8E-B9E7-D6996D1E3913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEEC6958-3E71-4A8E-B9E7-D6996D1E3913}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9AC883C2-B976-4B40-B2F6-ABE07F31E8DF}
+	EndGlobalSection
+EndGlobal
