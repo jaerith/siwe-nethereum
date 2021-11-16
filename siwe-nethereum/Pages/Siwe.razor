@@ -1,0 +1,26 @@
+﻿@page "/siwe"
+
+
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudMenu Label="Connect">
+                <MudMenuItem>Metamask</MudMenuItem>
+                <MudMenuItem>WalletConnect</MudMenuItem>
+            </MudMenu>
+        </MudItem>
+    </MudGrid>
+    <MudSpacer />
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField T="string" Label="Message to Save" Variant="Variant.Outlined" Text="@sampleText" Lines="5" />
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
+    </MudGrid>
+</MudContainer>
+
+@code {
+    string sampleText = String.Empty;
+}
