@@ -6,11 +6,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
-using siwe_nethereum.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using FluentValidation;
+using Nethereum.Metamask;
+using Nethereum.Metamask.Blazor;
+using Nethereum.UI;
+using siwe_nethereum.Data;
 
 namespace siwe_nethereum
 {
@@ -31,6 +36,17 @@ namespace siwe_nethereum
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddMudServices();
+
+            services.AddScoped<IMetamaskInterop, MetamaskBlazorInterop>();
+            services.AddScoped<MetamaskInterceptor>();
+            services.AddScoped<MetamaskHostProvider>();
+            services.AddScoped<IEthereumHostProvider>(serviceProvider =>
+            {
+                return serviceProvider.GetService<MetamaskHostProvider>();
+            });
+            services.AddScoped<IEthereumHostProvider, MetamaskHostProvider>();
+            services.AddScoped<NethereumAuthenticator>();
+            services.AddValidatorsFromAssemblyContaining<Nethereum.Erc20.Blazor.Erc20Transfer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +73,7 @@ namespace siwe_nethereum
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
         }
     }
 }
