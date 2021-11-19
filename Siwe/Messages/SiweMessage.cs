@@ -76,11 +76,40 @@ namespace Siwe.Messages
 		}
 		 */
 
-		#region Support Methods
 		public void ParseMessage(string unparsedMessage)
 		{
 			// NOTE: Not yet implemented
 		}
+
+		/**
+		 * This function can be used to retrieve an EIP-712 formated message for
+		 * signature, although you can call it directly it's advised to use
+		 * [signMessage()] instead which will resolve to the correct method based
+		 * on the [type] attribute of this object, in case of other formats being
+		 * implemented.
+		 * @returns {string} EIP-712 formated message.
+		 */
+		public string toMessage()
+        {
+			// NOTE: Not yet implemented
+			return string.Empty;
+        }
+
+		/**
+		 * This method parses all the fields in the object and creates a sign
+		 * message according with the type defined.
+		 * @returns {string} Returns a message ready to be signed according with the
+		 * type defined in the object.
+		 */
+		public string signMessage()
+        {
+			// NOTE: Not yet implemented
+			return string.Empty;
+		}
+
+
+		#region Support Methods
+
 		#endregion
 	}
 }

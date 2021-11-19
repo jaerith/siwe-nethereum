@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Nethereum.UI;
+
 using Siwe.Messages;
 
 namespace siwe
 {
     public static class SiweExtensions
     {
-        const string GRAMMAR =
+        const string CONST_ABNF_GRAMMAR =
 @"
 sign-in-with-ethereum =
     domain %s"" wants you to sign in with your Ethereum account:"" LF
@@ -160,11 +162,33 @@ DIGIT          =  %x30-39
 HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
 ";
 
-		public static void Ingest(this SiweMessage message, string siwePayload)
+        public const string REGEX_DOMAIN  = @"(([a-zA-Z]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}";
+        public const string REGEX_ADDRESS = @"0x[a-zA-Z0-9]{40}";
+        public const string REGEX_URI     = @"(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?";
+
+        public const string REGEX_DATETIME =
+            @"([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\\.[0-9]+)?(([Zz])|([\\+|\\-]([01][0-9]|2[0-3]):[0-5][0-9]))";
+
+        public const string REGEX_REQUESTID = @"[-._~!$&'()*+,;=:@%a-zA-Z0-9]*";
+
+        public static void Ingest(this SiweMessage message, string siwePayload, bool bUseBNFParser = false)
 		{
 			// NOTE: Future implementation here
 		}
 
-	}
+        /**
+         * Validates the integrity of the fields of this objects by matching it's
+         * signature.
+         * @param provider A Web3 provider able to perform a contract check, this is
+         * required if support for Smart Contract Wallets that implement EIP-1271 is
+         * needed.
+         * @returns {Task<SiweMessage>} This object if valid.
+         */
+        public static async Task Validate(this SiweMessage message, IEthereumHostProvider provider)
+        {
+            var web3 = await provider.GetWeb3Async();
+        }
+
+    }
 
 }

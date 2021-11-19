@@ -82,6 +82,8 @@ else
             _ethereumHostProvider.SelectedAccountChanged += HostProvider_SelectedAccountChanged;
 
             EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
+
+            SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
         }
     }
 
