@@ -9,7 +9,30 @@
 @using Nethereum.Web3;
 @using Nethereum.Hex.HexTypes;
 
+<MudItem xs="12" sm="6" md="3">
+    <MudTextField @bind-Value="SelectedAccount" Label="Selected Account:" ReadOnly="true" Variant="Variant.Filled" />
+</MudItem>
+<MudSpacer />
+<div class="card m-1">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-6">
+            @if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
+             {
+                <small id="selectedAccountHelp" class="form-text text-muted">The selected account is bound to the host (ie Metamask) on change</small>
+             }
+             else
+             {
+                <small id="selectedAccountHelp" class="form-text text-muted">Select an account</small>
+             }
+            </div>
+        </div>
+    </div>
+</div>
+<MudSpacer />
+
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <!--
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
             <MudMenu Label="Connect">
@@ -19,9 +42,10 @@
         </MudItem>
     </MudGrid>
     <MudSpacer />
+    -->
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
-            <MudTextField T="string" Label="Message to Save" Variant="Variant.Outlined" Text="@sampleText" Lines="5" />
+            <MudTextField T="string" Label="Message to Save" Variant="Variant.Outlined" Text="@sampleText" Lines="10" />
         </MudItem>
     </MudGrid>
     <MudGrid>
@@ -31,44 +55,26 @@
 
 @if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
 {
+    <MudSpacer/>
+    <MudSpacer/>
+    <MudSpacer/>
     <div class="card m-1">
         <div class="card-body">
             <div class="row">
-                <label class="col-sm-3 col-form-label-lg">Selected Account:</label>
+                <label class="col-sm-3 col-form-label-lg">Authentication by signing:</label>
                 <div class="col-sm-6">
-                    @SelectedAccount
-                    <small id="selectedAccountHelp" class="form-text text-muted">The selected account is bound to the host (ie Metamask) on change</small>
+                    <button @onclick="@AuthenticateAsync">Authenticate</button>
+                    <div>@AuthenticatedAccount</div>
+                    <small id="selectedAccountHelp" class="form-text text-muted">Creating an unique challenge per authentication request, allows us to recover and validate what account has signed the message</small>
                 </div>
             </div>
         </div>
     </div>
-<!--
-<div class="card m-1">
-    <div class="card-body">
-        <div class="row">
-            <label class="col-sm-3 col-form-label-lg">Authentication by signing:</label>
-            <div class="col-sm-6">
-                <button @onclick="@AuthenticateAsync">Authenticate</button>
-                <div>@AuthenticatedAccount</div>
-                <small id="selectedAccountHelp" class="form-text text-muted">Creating an unique challenge per authentication request, allows us to recover and validate what account has signed the message</small>
-            </div>
-        </div>
-    </div>
-</div>
--->
 }
-<!--
-else
-{
-<div>
-    Please connect to Ethereum !
-</div>
-}
--->
 
 @code {
-    string sampleText = "oompa loompa";
-    string SelectedAccount = "garbage";
+    string sampleText      = "oompa loompa";
+    string SelectedAccount = String.Empty;
 
     bool EthereumAvailable { get; set; }
     string BlockHash { get; set; }
@@ -90,6 +96,7 @@ else
     private async Task HostProvider_SelectedAccountChanged(string account)
     {
         SelectedAccount = account;
+
         this.StateHasChanged();
     }
 
