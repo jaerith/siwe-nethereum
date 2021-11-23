@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Siwe.Messages
+namespace siwe.Messages
 {
     [DataContract(Namespace = "http://siwe.metdatadojo.wordpress.com", Name = "ErrorTypes")]
     public enum ErrorTypes

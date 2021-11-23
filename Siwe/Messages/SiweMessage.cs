@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Siwe.Messages
+using siwe.Base36;
+
+namespace siwe.Messages
 {
-	public class SiweMessage
+	public record SiweMessage
 	{
 		/**RFC 4501 dns authority that is requesting the signing. */
 		public string? Domain { get; set; }
@@ -91,9 +93,85 @@ namespace Siwe.Messages
 		 */
 		public string toMessage()
         {
-			// NOTE: Not yet implemented
-			return string.Empty;
-        }
+			string message = string.Empty;
+
+			// Instantiate random number generator using system-supplied value as seed.
+			var rand = new System.Random();
+
+			string Header 
+				= "{Domain} wants you to sign in with your Ethereum account:";
+
+			string UriField = "URI: {Uri}";
+
+			string prefix = Header + "\n" + UriField;
+
+			string versionField = "Version: {Version}";
+
+			/*
+			 * NOTE: Not yet implemented
+			 * 
+			if (string.IsNullOrEmpty(Nonce))
+			{
+				this.nonce = (Math.random() + 1).toString(36).substring(4);
+			}
+
+			const nonceField = `Nonce: ${ this.nonce}`;
+
+			const suffixArray = [uriField, versionField, nonceField];
+
+			if (this.issuedAt)
+			{
+				Date.parse(this.issuedAt);
+			}
+			this.issuedAt = this.issuedAt
+				? this.issuedAt
+				: new Date().toISOString();
+			suffixArray.push(`Issued At: ${ this.issuedAt}`);
+
+			if (this.expirationTime)
+			{
+				const expiryField = `Expiration Time: ${ this.expirationTime}`;
+
+				suffixArray.push(expiryField);
+			}
+
+			if (this.notBefore)
+			{
+				suffixArray.push(`Not Before: ${ this.notBefore}`);
+			}
+
+			if (this.requestId)
+			{
+				suffixArray.push(`Request ID: ${ this.requestId}`);
+			}
+
+			if (this.chainId)
+			{
+				suffixArray.push(`Chain ID: ${ this.chainId}`);
+			}
+
+			if (this.resources)
+			{
+				suffixArray.push(
+	
+					[`Resources:`, ...this.resources.map((x) => `- ${ x}`)].join(
+'\n'
+)
+				);
+			}
+
+			let suffix = suffixArray.join('\n');
+
+			if (this.statement)
+			{
+				prefix = [prefix, this.statement].join('\n\n');
+			}
+
+			return [prefix, suffix].join('\n\n');
+			*/
+
+			return message;
+		}
 
 		/**
 		 * This method parses all the fields in the object and creates a sign

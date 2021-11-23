@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Nethereum.UI;
 
-using Siwe.Messages;
+using siwe.Messages;
 
 namespace siwe
 {
