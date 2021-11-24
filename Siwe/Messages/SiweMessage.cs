@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 using siwe.Base36;
 
@@ -91,7 +93,7 @@ namespace siwe.Messages
 		 * implemented.
 		 * @returns {string} EIP-712 formated message.
 		 */
-		public string toMessage()
+		public string ToMessage()
         {
 			string message = string.Empty;
 
@@ -101,76 +103,67 @@ namespace siwe.Messages
 			string Header 
 				= "{Domain} wants you to sign in with your Ethereum account:";
 
-			string UriField = "URI: {Uri}";
+			string uriField = "URI: {Uri}";
 
-			string prefix = Header + "\n" + UriField;
+			string prefix = Header + "\n" + uriField;
 
 			string versionField = "Version: {Version}";
 
-			/*
-			 * NOTE: Not yet implemented
-			 * 
-			if (string.IsNullOrEmpty(Nonce))
+			this.Nonce = 
+				Base36Converter.ConvertTo(System.Convert.ToInt64((rand.NextDouble() + 1).ToString().Replace(".", ""))).Substring(4);
+
+			string nonceField = "Nonce: {this.Nonce}";
+
+			List<string> suffixArray = new List<string>() { uriField, versionField, nonceField };
+
+			if (!string.IsNullOrEmpty(IssuedAt))
+            {
+				// NOTE: Should validation occur here?
+            }
+
+			IssuedAt = 
+				!string.IsNullOrEmpty(IssuedAt) ? IssuedAt : System.DateTime.UtcNow.ToString("o");
+
+			suffixArray.Add("Issued At: ${IssuedAt}");
+
+			if (!string.IsNullOrEmpty(ExpirationTime))
+            {
+				suffixArray.Add("Expiration Time: ${ExpirationTime}");
+            }
+
+			if (!string.IsNullOrEmpty(NotBefore))
 			{
-				this.nonce = (Math.random() + 1).toString(36).substring(4);
+				suffixArray.Add("Not Before: ${NotBefore}");
 			}
 
-			const nonceField = `Nonce: ${ this.nonce}`;
-
-			const suffixArray = [uriField, versionField, nonceField];
-
-			if (this.issuedAt)
+			if (!string.IsNullOrEmpty(RequestId))
 			{
-				Date.parse(this.issuedAt);
-			}
-			this.issuedAt = this.issuedAt
-				? this.issuedAt
-				: new Date().toISOString();
-			suffixArray.push(`Issued At: ${ this.issuedAt}`);
-
-			if (this.expirationTime)
-			{
-				const expiryField = `Expiration Time: ${ this.expirationTime}`;
-
-				suffixArray.push(expiryField);
+				suffixArray.Add("Request ID: ${RequestId}");
 			}
 
-			if (this.notBefore)
+			if (!string.IsNullOrEmpty(ChainId))
 			{
-				suffixArray.push(`Not Before: ${ this.notBefore}`);
+				suffixArray.Add("Chain ID: ${ChainId}");
 			}
 
-			if (this.requestId)
-			{
-				suffixArray.push(`Request ID: ${ this.requestId}`);
-			}
+			if ((Resources != null) && (Resources.Count > 0))
+            {
+				suffixArray.Add("Resources:\n");
+				Resources.ToList().ForEach(x => suffixArray.Add("- " + x + "\n"));
+            }
 
-			if (this.chainId)
-			{
-				suffixArray.push(`Chain ID: ${ this.chainId}`);
-			}
+			StringBuilder SuffixBuilder = new StringBuilder();
+			suffixArray.ToList().ForEach(x => SuffixBuilder.Append(x).Append("\n"));
 
-			if (this.resources)
-			{
-				suffixArray.push(
-	
-					[`Resources:`, ...this.resources.map((x) => `- ${ x}`)].join(
-'\n'
-)
-				);
-			}
+			StringBuilder MsgBuilder = new StringBuilder(prefix);
+			if (!string.IsNullOrEmpty(Statement))
+            {
+				MsgBuilder.Append("\n\n").Append(Statement);
+            }
 
-			let suffix = suffixArray.join('\n');
+			MsgBuilder.Append("\n\n").Append(SuffixBuilder.ToString());
 
-			if (this.statement)
-			{
-				prefix = [prefix, this.statement].join('\n\n');
-			}
-
-			return [prefix, suffix].join('\n\n');
-			*/
-
-			return message;
+			return MsgBuilder.ToString();
 		}
 
 		/**
@@ -179,7 +172,7 @@ namespace siwe.Messages
 		 * @returns {string} Returns a message ready to be signed according with the
 		 * type defined in the object.
 		 */
-		public string signMessage()
+		public string SignMessage()
         {
 			// NOTE: Not yet implemented
 			return string.Empty;
