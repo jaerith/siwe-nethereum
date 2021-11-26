@@ -1,5 +1,6 @@
 ﻿@page "/siwe"
 
+@using System.IO;
 @using Nethereum.UI;
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
@@ -43,21 +44,25 @@
     </MudGrid>
     <MudSpacer />
     -->
+    <!--
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
-            <MudTextField T="string" Label="Message to Save" Variant="Variant.Outlined" Text="@sampleText" Lines="10" />
+            <MudTextField Label="Message to Save" Variant="Variant.Outlined" @bind-Value="SampleText" Lines="10"/>
         </MudItem>
     </MudGrid>
+    -->
+    <textarea id="SaveText" name="Mesage to Save" rows="10" cols="100" @oninput="HandleOnChange">
+    @SampleText
+    </textarea>
     <MudGrid>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
     </MudGrid>
 </MudContainer>
 
 @if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
 {
     <MudSpacer/>
-    <MudSpacer/>
-    <MudSpacer/>
+    <br/>
     <div class="card m-1">
         <div class="card-body">
             <div class="row">
@@ -73,11 +78,12 @@
 }
 
 @code {
-    string sampleText      = "oompa loompa";
-    string SelectedAccount = String.Empty;
+
+    static string SelectedAccount = String.Empty;
 
     bool EthereumAvailable { get; set; }
     string BlockHash { get; set; }
+    string SampleText { get; set;}
 
     protected string AuthenticatedAccount { get; set; }
 
@@ -90,12 +96,35 @@
             EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
 
             SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
+
+            FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
+            if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
+            {
+                SampleText = await File.ReadAllTextAsync(textFile.FullName);
+            }
+            else
+            {
+                SampleText = "Oompa Loompa";
+            }
+
+            this.StateHasChanged();
         }
+    }
+
+    private async Task HandleOnChange(ChangeEventArgs args)
+    {
+        SampleText = args.Value.ToString();
     }
 
     private async Task HostProvider_SelectedAccountChanged(string account)
     {
         SelectedAccount = account;
+
+        FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
+        if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
+        {
+            SampleText = await File.ReadAllTextAsync(textFile.FullName);
+        }
 
         this.StateHasChanged();
     }
@@ -110,6 +139,22 @@
     public async Task AuthenticateAsync()
     {
         AuthenticatedAccount = await _nethereumAuthenticator.RequestNewChallengeSignatureAndRecoverAccountAsync();
+    }
+
+    public async Task UpdateText()
+    {
+        DirectoryInfo dbDir = new DirectoryInfo("../db");        
+        if (!dbDir.Exists)
+        {
+            dbDir.Create();
+        }
+
+        if (!String.IsNullOrEmpty(SelectedAccount) && !String.IsNullOrEmpty(SampleText))
+        {
+            await File.WriteAllTextAsync("../db/" + SelectedAccount + ".txt", SampleText);          
+        }
+
+        this.StateHasChanged();
     }
 
 }
