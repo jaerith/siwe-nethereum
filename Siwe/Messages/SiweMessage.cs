@@ -97,9 +97,6 @@ namespace siwe.Messages
         {
 			string message = string.Empty;
 
-			// Instantiate random number generator using system-supplied value as seed.
-			var rand = new System.Random();
-
 			string Header 
 				= "{Domain} wants you to sign in with your Ethereum account:";
 
@@ -109,8 +106,7 @@ namespace siwe.Messages
 
 			string versionField = "Version: {Version}";
 
-			this.Nonce = 
-				Base36Converter.ConvertTo(System.Convert.ToInt64((rand.NextDouble() + 1).ToString().Replace(".", ""))).Substring(4);
+			this.Nonce = GetNonce();
 
 			string nonceField = "Nonce: {this.Nonce}";
 
@@ -180,6 +176,15 @@ namespace siwe.Messages
 
 
 		#region Support Methods
+
+		public static string GetNonce()
+        {
+			// Instantiate random number generator using system-supplied value as seed.
+			var rand = new System.Random();
+
+			return
+				Base36Converter.ConvertTo(System.Convert.ToInt64((rand.NextDouble() + 1).ToString().Replace(".", ""))).Substring(4);
+		}
 
 		#endregion
 	}
