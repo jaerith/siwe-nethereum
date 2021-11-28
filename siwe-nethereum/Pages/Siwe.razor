@@ -4,9 +4,12 @@
 @using Nethereum.UI;
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
+@using siwe.Messages
+@using siwe_nethereum.Data
 @inject IJSRuntime jsRuntime;
 @inject IEthereumHostProvider _ethereumHostProvider;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
+@inject SiweService _siweService;
 @using Nethereum.Web3;
 @using Nethereum.Hex.HexTypes;
 
@@ -79,9 +82,10 @@
 
 @code {
 
-    static string SelectedAccount = String.Empty;
+    string SelectedAccount = String.Empty;
 
     bool EthereumAvailable { get; set; }
+    string ChainId { get; set; }
     string BlockHash { get; set; }
     string SampleText { get; set;}
 
@@ -96,6 +100,12 @@
             EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
 
             SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
+
+            var SelectedNetwork = await _ethereumHostProvider.GetProviderSelectedNetworkAsync();
+            if (SelectedNetwork >= 0)
+            {
+                ChainId = Convert.ToString(SelectedNetwork);
+            }
 
             FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
             if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
@@ -126,6 +136,8 @@
             SampleText = await File.ReadAllTextAsync(textFile.FullName);
         }
 
+        await SiweSignIn();
+
         this.StateHasChanged();
     }
 
@@ -139,6 +151,33 @@
     public async Task AuthenticateAsync()
     {
         AuthenticatedAccount = await _nethereumAuthenticator.RequestNewChallengeSignatureAndRecoverAccountAsync();
+    }
+
+    protected async Task SiweSignIn()
+    {
+        // NOTE: Provider class does not yet implement ENS resolution
+        var ENSAddress = String.Empty;
+
+        var newNonce = await _siweService.GetNonce();
+
+        var message =
+            new SiweMessage()
+                {
+                    Domain = "localhost"
+                    , Address = this.SelectedAccount
+                    , ChainId = this.ChainId
+                    , Uri = "https://localhost"
+                    , Version = "1"
+                    , Statement = "SIWE Notepad Example"
+                    , Type = SignatureType.PERSONAL_SIGNATURE
+                    , Nonce = newNonce
+                };
+
+        var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
+
+        message.Signature = signature;
+
+        var MeResult = await _siweService.PostSignIn(message);
     }
 
     public async Task UpdateText()

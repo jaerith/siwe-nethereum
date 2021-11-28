@@ -58,7 +58,10 @@ namespace siwe.Messages
 		public string? Signature { get; set; }
 
 		/**Type of sign message to be generated. */
-		public SignatureType? type { get; set; }
+		public SignatureType? Type { get; set; }
+
+		public SiweMessage()
+		{ }
 
 		/**
 		 * Creates a parsed Sign-In with Ethereum Message (EIP-4361) object from a
