@@ -101,12 +101,6 @@
 
             SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
 
-            var SelectedNetwork = await _ethereumHostProvider.GetProviderSelectedNetworkAsync();
-            if (SelectedNetwork >= 0)
-            {
-                ChainId = Convert.ToString(SelectedNetwork);
-            }
-
             FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
             if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
             {
@@ -118,6 +112,21 @@
             }
 
             this.StateHasChanged();
+        }
+
+        if (!String.IsNullOrEmpty(SelectedAccount))
+        {
+            /**
+             ** NOTE: Not yet implemented
+             **
+            var SelectedNetwork = await _ethereumHostProvider.GetProviderSelectedNetworkAsync();
+            if (SelectedNetwork >= 0)
+            {
+                ChainId = Convert.ToString(SelectedNetwork);
+            }
+             **/
+
+            ChainId = "1";
         }
     }
 
