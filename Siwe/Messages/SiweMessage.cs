@@ -101,17 +101,17 @@ namespace siwe.Messages
 			string message = string.Empty;
 
 			string Header 
-				= "{Domain} wants you to sign in with your Ethereum account:";
+				= $"{Domain} wants you to sign in with your Ethereum account:\n{Address}";
 
-			string uriField = "URI: {Uri}";
+			string uriField = $"URI: {Uri}";
 
-			string prefix = Header + "\n" + uriField;
+			string prefix = Header;
 
-			string versionField = "Version: {Version}";
+			string versionField = $"Version: {Version}";
 
 			this.Nonce = GetNonce();
 
-			string nonceField = "Nonce: {this.Nonce}";
+			string nonceField = $"Nonce: {this.Nonce}";
 
 			List<string> suffixArray = new List<string>() { uriField, versionField, nonceField };
 
@@ -123,26 +123,30 @@ namespace siwe.Messages
 			IssuedAt = 
 				!string.IsNullOrEmpty(IssuedAt) ? IssuedAt : System.DateTime.UtcNow.ToString("o");
 
-			suffixArray.Add("Issued At: ${IssuedAt}");
+			suffixArray.Add($"Issued At: ${IssuedAt}");
 
 			if (!string.IsNullOrEmpty(ExpirationTime))
             {
-				suffixArray.Add("Expiration Time: ${ExpirationTime}");
+				suffixArray.Add($"Expiration Time: ${ExpirationTime}");
             }
 
 			if (!string.IsNullOrEmpty(NotBefore))
 			{
-				suffixArray.Add("Not Before: ${NotBefore}");
+				suffixArray.Add($"Not Before: ${NotBefore}");
 			}
 
 			if (!string.IsNullOrEmpty(RequestId))
 			{
-				suffixArray.Add("Request ID: ${RequestId}");
+				suffixArray.Add($"Request ID: ${RequestId}");
 			}
 
 			if (!string.IsNullOrEmpty(ChainId))
 			{
-				suffixArray.Add("Chain ID: ${ChainId}");
+				suffixArray.Add($"Chain ID: ${ChainId}");
+			}
+			else
+            {
+				suffixArray.Add("Chain ID: 1");
 			}
 
 			if ((Resources != null) && (Resources.Count > 0))
@@ -173,10 +177,25 @@ namespace siwe.Messages
 		 */
 		public string SignMessage()
         {
-			// NOTE: Not yet implemented
-			return string.Empty;
-		}
+			string message = string.Empty;
 
+			switch (this.Type)
+			{
+				case SignatureType.PERSONAL_SIGNATURE:
+					{
+						message = this.ToMessage();
+						break;
+					}
+
+				default:
+					{
+						message = this.ToMessage();
+						break;
+					}
+			}
+
+			return message;
+		}
 
 		#region Support Methods
 
