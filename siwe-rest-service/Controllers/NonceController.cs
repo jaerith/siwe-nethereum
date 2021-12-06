@@ -8,12 +8,17 @@ namespace siwe_rest_service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NonceController : ControllerBase
+    public class NonceController : Controller
     {
         [HttpGet()]
         public string GetNonce()
         {
-            return SiweMessage.GetNonce();
+            string nonce = SiweMessage.GetNonce();
+
+            TempData["nonce"] = nonce;
+            // HttpContext.Session.SetString("nonce", nonce);
+
+            return nonce;
         }
     }
 }

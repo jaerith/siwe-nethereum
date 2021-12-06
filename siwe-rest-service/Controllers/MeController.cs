@@ -14,6 +14,24 @@ namespace siwe_rest_service.Controllers
         [HttpGet()]
         public SiweMeResult Get()
         {
+            /**
+             ** NOTE: To be ported
+             **
+app.get('/api/me', async (req, res) => {
+    if (!req.session.siwe) {
+        res.status(401).json({ message: 'You have to first sign_in' });
+        return;
+    }
+    res.status(200)
+        .json({
+            text: getText(req.session.siwe.address),
+            address: req.session.siwe.address,
+            ens: req.session.ens,
+        })
+        .end();
+});
+            **/
+
             return new SiweMeResult();
         }
     }
