@@ -109,7 +109,10 @@ namespace siwe.Messages
 
 			string versionField = $"Version: {Version}";
 
-			this.Nonce = GetNonce();
+			if (string.IsNullOrEmpty(this.Nonce))
+			{
+				this.Nonce = GetNonce();
+			}
 
 			string nonceField = $"Nonce: {this.Nonce}";
 
