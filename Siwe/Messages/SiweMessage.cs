@@ -126,26 +126,26 @@ namespace siwe.Messages
 			IssuedAt = 
 				!string.IsNullOrEmpty(IssuedAt) ? IssuedAt : System.DateTime.UtcNow.ToString("o");
 
-			suffixArray.Add($"Issued At: ${IssuedAt}");
+			suffixArray.Add($"Issued At: {IssuedAt}");
 
 			if (!string.IsNullOrEmpty(ExpirationTime))
             {
-				suffixArray.Add($"Expiration Time: ${ExpirationTime}");
+				suffixArray.Add($"Expiration Time: {ExpirationTime}");
             }
 
 			if (!string.IsNullOrEmpty(NotBefore))
 			{
-				suffixArray.Add($"Not Before: ${NotBefore}");
+				suffixArray.Add($"Not Before: {NotBefore}");
 			}
 
 			if (!string.IsNullOrEmpty(RequestId))
 			{
-				suffixArray.Add($"Request ID: ${RequestId}");
+				suffixArray.Add($"Request ID: {RequestId}");
 			}
 
 			if (!string.IsNullOrEmpty(ChainId))
 			{
-				suffixArray.Add($"Chain ID: ${ChainId}");
+				suffixArray.Add($"Chain ID: {ChainId}");
 			}
 			else
             {
