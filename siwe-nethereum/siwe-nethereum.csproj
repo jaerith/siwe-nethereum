@@ -5,6 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\assets\License.md" />
+    <None Include="wwwroot\assets\README.md" />
+    <None Include="wwwroot\assets\SIWE_Button.png" />
+    <None Include="wwwroot\assets\SIWE_Icon_Color.png" />
+    <None Include="wwwroot\assets\SIWE_Icon_Gradient.png" />
+    <None Include="wwwroot\assets\SIWE_Icon_White.png" />
+    <None Include="wwwroot\assets\SIWE_Logomark_Black.png" />
+    <None Include="wwwroot\assets\SIWE_Logomark_Gradient.png" />
+    <None Include="wwwroot\assets\SIWE_Logomark_White.png" />
+    <None Include="wwwroot\assets\SIWE_Logo_DarkBG.png" />
+    <None Include="wwwroot\assets\SIWE_Logo_WhiteBG.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.4.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="MudBlazor" Version="5.1.5" />
