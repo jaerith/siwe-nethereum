@@ -17,6 +17,13 @@
     <MudTextField @bind-Value="SelectedAccount" Label="Selected Account:" ReadOnly="true" Variant="Variant.Filled" />
 </MudItem>
 <MudSpacer />
+<MudGrid>
+    <!--<MudAvatar Disabled=@BeforeSignedInWithEth Image="assets/SIWE_Icon_Gradient.png" />-->
+    <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE_Button.png"/></MudIconButton>
+</MudGrid>
+<MudSpacer />
+
+<!--
 <div class="card m-1">
     <div class="card-body">
         <div class="row">
@@ -33,20 +40,9 @@
         </div>
     </div>
 </div>
-<MudSpacer />
+-->
 
-<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-    <!--
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="4">
-            <MudMenu Label="Connect">
-                <MudMenuItem>Metamask</MudMenuItem>
-                <MudMenuItem>WalletConnect</MudMenuItem>
-            </MudMenu>
-        </MudItem>
-    </MudGrid>
-    <MudSpacer />
-    -->
+<MudContainer Class="mt-16 px-8" Style="height:30vh;" MaxWidth="MaxWidth.False">
     <!--
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
@@ -54,14 +50,24 @@
         </MudItem>
     </MudGrid>
     -->
+    <!--
+    -->
+    <MudSpacer />
+    <MudGrid>
+    <br/>
     <textarea id="SaveText" name="Mesage to Save" rows="10" cols="100" @oninput="HandleOnChange">
     @SampleText
     </textarea>
-    <MudGrid>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
     </MudGrid>
 </MudContainer>
 
+<MudContainer>
+    <MudGrid>
+        <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
+    </MudGrid>
+</MudContainer>
+
+<!--
 @if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
 {
     <MudSpacer/>
@@ -79,12 +85,15 @@
         </div>
     </div>
 }
+-->
 
 @code {
 
     string SelectedAccount = String.Empty;
 
     bool EthereumAvailable { get; set; }
+    bool BeforeSelectedAccount {  get;  set; } 
+    bool BeforeSignedInWithEth { get; set; }
     string ChainId { get; set; }
     string BlockHash { get; set; }
     string SampleText { get; set;}
@@ -95,6 +104,9 @@
     {
         if (firstTime)
         {
+            BeforeSelectedAccount = true;
+            BeforeSignedInWithEth = true;
+
             _ethereumHostProvider.SelectedAccountChanged += HostProvider_SelectedAccountChanged;
 
             EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
@@ -116,6 +128,8 @@
 
         if (!String.IsNullOrEmpty(SelectedAccount))
         {
+            BeforeSelectedAccount = false;
+
             /**
              ** NOTE: Not yet implemented
              **
@@ -137,15 +151,14 @@
 
     private async Task HostProvider_SelectedAccountChanged(string account)
     {
-        SelectedAccount = account;
+        SelectedAccount       = account;
+        BeforeSelectedAccount = false;
 
         FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
         if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
         {
             SampleText = await File.ReadAllTextAsync(textFile.FullName);
         }
-
-        await SiweSignIn();
 
         this.StateHasChanged();
     }
@@ -164,29 +177,34 @@
 
     protected async Task SiweSignIn()
     {
-        // NOTE: Provider class does not yet implement ENS resolution
-        var ENSAddress = String.Empty;
+        if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
+        {
+            // NOTE: Provider class does not yet implement ENS resolution
+            var ENSAddress = String.Empty;
 
-        var newNonce = await _siweService.GetNonce();
+            var newNonce = await _siweService.GetNonce();
 
-        var message =
-            new SiweMessage()
-                {
-                    Domain = "localhost"
-                    , Address = this.SelectedAccount
-                    , ChainId = this.ChainId
-                    , Uri = "https://localhost"
-                    , Version = "1"
-                    , Statement = "SIWE Notepad Example"
-                    , Type = SignatureType.PERSONAL_SIGNATURE
-                    , Nonce = newNonce
-                };
+            var message =
+                new SiweMessage()
+                    {
+                        Domain = "localhost"
+                        , Address = this.SelectedAccount
+                        , ChainId = this.ChainId
+                        , Uri = "https://localhost"
+                        , Version = "1"
+                        , Statement = "SIWE Notepad Example"
+                        , Type = SignatureType.PERSONAL_SIGNATURE
+                        , Nonce = newNonce
+                    };
 
-        var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
+            var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
 
-        message.Signature = signature;
+            message.Signature = signature;
 
-        var MeResult = await _siweService.PostSignIn(message);
+            var MeResult = await _siweService.PostSignIn(message);
+
+            BeforeSignedInWithEth = false;            
+        }
     }
 
     public async Task UpdateText()
