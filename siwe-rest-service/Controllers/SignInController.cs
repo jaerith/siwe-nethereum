@@ -2,6 +2,7 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
+using siwe;
 using siwe.Messages;
 
 using siwe_rest_service.Models;
@@ -16,98 +17,68 @@ namespace siwe_rest_service.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
         {
-            SiweMeResult result =
-                new SiweMeResult() { Address = message.Address, Text = message.ToMessage(), Ens = String.Empty };
+            string? nonce = String.Empty;
 
-            string? nonce = TempData.ContainsKey("nonce") ? (string) TempData["nonce"] : String.Empty;
+            if (message.Nonce == null)
+                return BadRequest("Provided nonce is null");
 
-            if (nonce != message.Nonce)
-                return BadRequest();
+            if (TempData.ContainsKey("nonce"))
+            {
+                nonce = (string)TempData["nonce"];
+            }
+            else if (!String.IsNullOrEmpty(HttpContext.Session.GetString("siwe")))
+            {
+                nonce = HttpContext.Session.GetString("siwe");
+            }
 
-            HttpContext.Session.SetString("siwe",  message.ToString());
+            if ((message == null) || String.IsNullOrEmpty(message.Address) || String.IsNullOrEmpty(message.Signature))
+                return UnprocessableEntity("Malformed session");
+
+            try
+            {
+                if (nonce != message.Nonce)
+                    return UnprocessableEntity();
+
+                message.Validate();
+            }
+            catch (InvalidSignatureException ex)
+            {
+                return BadRequest("Invalid Signature -> \n" + ex.ToString());
+            }
+            catch (ExpiredMessageException ex)
+            {
+                return BadRequest("Expired Message -> \n" + ex.ToString());
+            }
+            finally
+            {
+                HttpContext.Session.SetString("siwe",  string.Empty);
+                HttpContext.Session.SetString("ens",   string.Empty);
+                HttpContext.Session.SetString("nonce", string.Empty);
+            }
+
+            HttpContext.Session.SetString("siwe",  message.SignMessage());
             HttpContext.Session.SetString("ens",   string.Empty);
             HttpContext.Session.SetString("nonce", string.Empty);
+            // req.session.cookie.expires = new Date(fields.expirationTime);?
 
             /**
              ** NOTE: To be ported
              **
-app.post('/api/sign_in', async (req, res) => {
-    try {
-        const { ens } = req.body;
-        if (!req.body.message) {
-            res.status(422).json({ message: 'Expected signMessage object as body.' });
-            return;
-        }
-
-        const message = new SiweMessage(req.body.message);
-
-        const infuraProvider = new providers.JsonRpcProvider(
-            {
-                allowGzip: true,
-                url: `${getInfuraUrl(message.chainId)}/8fcacee838e04f31b6ec145eb98879c8`,
-                headers: {
-//                    Accept: '**',
-                    Origin: `http://localhost:${PORT}`,
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    'Content-Type': 'application/json',
-                },
-            },
-            Number.parseInt(message.chainId),
-        );
-
-await infuraProvider.ready;
-
-const fields: SiweMessage = await message.validate(infuraProvider);
-
-if (fields.nonce !== req.session.nonce)
-{
-    res.status(422).json({
-    message: `Invalid nonce.`,
-            });
-    return;
-}
-
-req.session.siwe = fields;
-req.session.ens = ens;
-req.session.nonce = null;
-req.session.cookie.expires = new Date(fields.expirationTime);
-req.session.save(() =>
-    res
-        .status(200)
-        .json({
-text: getText(req.session.siwe.address),
+        req.session.save(() =>
+            res
+                .status(200)
+                .json({
+                    text: getText(req.session.siwe.address),
                     address: req.session.siwe.address,
                     ens: req.session.ens,
                 })
                 .end(),
         );
-    } catch (e)
-{
-    req.session.siwe = null;
-    req.session.nonce = null;
-    req.session.ens = null;
-    console.error(e);
-    switch (e)
-    {
-        case ErrorTypes.EXPIRED_MESSAGE:
-            {
-                req.session.save(() => res.status(440).json({ message: e.message }));
-                break;
-            }
-        case ErrorTypes.INVALID_SIGNATURE:
-            {
-                req.session.save(() => res.status(422).json({ message: e.message }));
-                break;
-            }
-        default:
-            {
-                req.session.save(() => res.status(500).json({ message: e.message }));
-                break;
-            }
-    }
-}
-});
+
             **/
+
+            SiweMeResult result =
+                new SiweMeResult() { Address = message.Address, Text = message.SignMessage(), Ens = String.Empty };
 
             return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
         }
