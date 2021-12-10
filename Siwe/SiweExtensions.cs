@@ -186,7 +186,39 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
          * needed.
          * @returns {Task<SiweMessage>} This object if valid.
          */
-        public static async Task Validate(this SiweMessage message, IEthereumHostProvider provider = null)
+        public static void Validate(this SiweMessage message)
+        {
+            string messageBody = message.SignMessage();
+
+            var signer = new EthereumMessageSigner();
+
+            var recoveredAddress = signer.EncodeUTF8AndEcRecover(messageBody, message.Signature);
+
+            // NOTE: Should we address any EIP-55 issues here?
+            if (recoveredAddress.ToLower() != message?.Address?.ToLower())
+            {
+                throw new InvalidSignatureException();
+            }
+
+            if (!String.IsNullOrEmpty(message.ExpirationTime))
+            {
+                DateTime currDateTime = DateTime.Now;
+                DateTime expiredDateTime = DateTime.Parse(message.ExpirationTime);
+
+                if (currDateTime > expiredDateTime)
+                    throw new ExpiredMessageException();
+            }
+        }
+
+        /**
+         * Validates the integrity of the fields of this objects by matching it's
+         * signature.
+         * @param provider A Web3 provider able to perform a contract check, this is
+         * required if support for Smart Contract Wallets that implement EIP-1271 is
+         * needed.
+         * @returns {Task<SiweMessage>} This object if valid.
+         */
+        public static async Task ValidateAsync(this SiweMessage message, IEthereumHostProvider provider = null)
         {
             if (provider != null)
             {
@@ -196,25 +228,7 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
             }
             else
             {
-                string messageBody = message.SignMessage();
-
-                var signer = new EthereumMessageSigner();
-
-                var recoveredAddress = signer.EncodeUTF8AndEcRecover(messageBody, message.Signature);
-
-                if (recoveredAddress != message.Address)
-                {
-                    throw new InvalidSignatureException();
-                }
-
-                if (!String.IsNullOrEmpty(message.ExpirationTime))
-                {
-                    DateTime currDateTime = DateTime.Now;
-                    DateTime expiredDateTime = DateTime.Parse(message.ExpirationTime);
-
-                    if (currDateTime > expiredDateTime)
-                        throw new ExpiredMessageException();
-                }
+                Validate(message);
             }
         }
 
