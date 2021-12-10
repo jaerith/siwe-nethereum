@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Nethereum.Signer;
+
 using Nethereum.UI;
 
 using siwe.Messages;
@@ -184,9 +186,36 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
          * needed.
          * @returns {Task<SiweMessage>} This object if valid.
          */
-        public static async Task Validate(this SiweMessage message, IEthereumHostProvider provider)
+        public static async Task Validate(this SiweMessage message, IEthereumHostProvider provider = null)
         {
-            var web3 = await provider.GetWeb3Async();
+            if (provider != null)
+            {
+                var web3 = await provider.GetWeb3Async();
+
+                // NOTE: Use the provider if possible? 
+            }
+            else
+            {
+                string messageBody = message.SignMessage();
+
+                var signer = new EthereumMessageSigner();
+
+                var recoveredAddress = signer.EncodeUTF8AndEcRecover(messageBody, message.Signature);
+
+                if (recoveredAddress != message.Address)
+                {
+                    throw new InvalidSignatureException();
+                }
+
+                if (!String.IsNullOrEmpty(message.ExpirationTime))
+                {
+                    DateTime currDateTime = DateTime.Now;
+                    DateTime expiredDateTime = DateTime.Parse(message.ExpirationTime);
+
+                    if (currDateTime > expiredDateTime)
+                        throw new ExpiredMessageException();
+                }
+            }
         }
 
     }
