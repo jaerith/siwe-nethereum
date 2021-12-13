@@ -6,10 +6,11 @@
 @using Nethereum.Erc20.Blazor;
 @using siwe.Messages
 @using siwe_nethereum.Data
+@using siwe_nethereum.RestServices
 @inject IJSRuntime jsRuntime;
 @inject IEthereumHostProvider _ethereumHostProvider;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
-@inject SiweService _siweService;
+@inject SiweRestService _siweRestService;
 @using Nethereum.Web3;
 @using Nethereum.Hex.HexTypes;
 
@@ -88,6 +89,8 @@
 -->
 
 @code {
+
+    [Inject] private IDialogService DialogService { get; set; }
 
     string SelectedAccount = String.Empty;
 
@@ -182,7 +185,9 @@
             // NOTE: Provider class does not yet implement ENS resolution
             var ENSAddress = String.Empty;
 
-            var newNonce = await _siweService.GetNonce();
+            var newNonce = await _siweRestService.GetNonce();
+            if (newNonce.Contains("\""))
+                newNonce = newNonce.Replace("\"", string.Empty);
 
             var message =
                 new SiweMessage()
@@ -197,13 +202,22 @@
                         , Nonce = newNonce
                     };
 
+            message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
+
             var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
 
             message.Signature = signature;
 
-            var MeResult = await _siweService.PostSignIn(message);
+            var result = await _siweRestService.PostSignIn(message);
 
-            BeforeSignedInWithEth = false;            
+            if (!String.IsNullOrEmpty(result.Address))
+            {
+                BeforeSignedInWithEth = false;                       
+            }
+            else
+            {
+                await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
+            }
         }
     }
 

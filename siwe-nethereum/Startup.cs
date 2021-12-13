@@ -15,7 +15,9 @@ using FluentValidation;
 using Nethereum.Metamask;
 using Nethereum.Metamask.Blazor;
 using Nethereum.UI;
+
 using siwe_nethereum.Data;
+using siwe_nethereum.RestServices;
 
 namespace siwe_nethereum
 {
@@ -36,6 +38,7 @@ namespace siwe_nethereum
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<SiweService>();
+            services.AddSingleton<SiweRestService>(new SiweRestService("https://localhost:7148/"));
             services.AddMudServices();
 
             services.AddScoped<IMetamaskInterop, MetamaskBlazorInterop>();
