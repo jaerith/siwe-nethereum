@@ -6,6 +6,8 @@ namespace siwe_rest_service.Models
     {
         public string? Text { get; set; }
 
+        public string? Ens { get; set; }
+
         public SiweMessageAndText() : base()
         { }
 

@@ -28,7 +28,11 @@ namespace siwe_rest_service.Controllers
             }
             else if (!String.IsNullOrEmpty(HttpContext.Session.GetString("siwe")))
             {
+                /**
+                 ** NOTE: Get nonce from stored SIWE message
+                 **
                 nonce = HttpContext.Session.GetString("siwe");
+                 **/
             }
 
             if ((message == null) || String.IsNullOrEmpty(message.Address) || String.IsNullOrEmpty(message.Signature))
@@ -61,24 +65,10 @@ namespace siwe_rest_service.Controllers
             HttpContext.Session.SetString("nonce", string.Empty);
             // req.session.cookie.expires = new Date(fields.expirationTime);?
 
-            /**
-             ** NOTE: To be ported
-             **
-        req.session.save(() =>
-            res
-                .status(200)
-                .json({
-                    text: getText(req.session.siwe.address),
-                    address: req.session.siwe.address,
-                    ens: req.session.ens,
-                })
-                .end(),
-        );
+            TempData["siwe"] = message.ToMessage();
 
-            **/
-
-            SiweMeResult result =
-                new SiweMeResult() { Address = message.Address, Text = message.SignMessage(), Ens = String.Empty };
+            SiweMessageAndText result =
+                new SiweMessageAndText() { Address = message.Address, Text = message.ToMessage(), Ens = String.Empty };
 
             return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
         }
