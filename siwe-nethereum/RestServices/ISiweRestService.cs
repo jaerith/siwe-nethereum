@@ -15,6 +15,6 @@ namespace siwe_nethereum.RestServices
 
         public Task<SiweMeResult> PostSignOut(SiweMessage message);
 
-        public Task<SiweMessageAndText> PutSave(SiweMessage message);
+        public Task<SiweMessageAndText> PutSave(SiweMessageAndText message);
     }
 }

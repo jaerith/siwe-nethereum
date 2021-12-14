@@ -73,15 +73,14 @@ namespace siwe_nethereum.RestServices
             return meResult;
         }
 
-        public async Task<SiweMessageAndText> PutSave(SiweMessage message)
+        public async Task<SiweMessageAndText> PutSave(SiweMessageAndText message)
         {
             var MsgWithText = new SiweMessageAndText();
-            var response    = await httpClient.PutAsJsonAsync<SiweMessage>("api/save", message);
+            var response    = await httpClient.PutAsJsonAsync<SiweMessageAndText>("api/save", message);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                MsgWithText = JsonConvert.DeserializeObject<SiweMessageAndText>(responseContent);
+                MsgWithText = null;
             }
 
             return MsgWithText;

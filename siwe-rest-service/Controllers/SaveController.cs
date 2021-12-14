@@ -4,6 +4,9 @@
 
 using siwe.Messages;
 
+using siwe_rest_service;
+using siwe_rest_service.Models;
+
 namespace siwe_rest_service.Controllers
 {
     [Route("api/[controller]")]
@@ -12,33 +15,26 @@ namespace siwe_rest_service.Controllers
     {
         // PUT api/<SaveController>/5
         [HttpPut]
-        public IActionResult Update([FromBody] SiweMessage message)
+        public IActionResult Update([FromBody] SiweMessageAndText message)
         {
             if ((message == null) || string.IsNullOrEmpty(message.Address))
                 return BadRequest();
 
-            /**
-             ** NOTE: To be ported
-             **
-app.put('/api/save', async (req, res) => {
-if (!req.session.siwe)
-{
-    res.status(401).json({ message: 'You have to first sign_in' });
-return;
-    }
+            string? msg = null;
 
-    await fs.readdir(Path.resolve(__dirname, `.. / db`), (err, files) => {
-    if (files.length === 1000001)
-    {
-        res.status(500).json({ message: 'File limit reached!' });
-return;
-        }
-    });
+            if (TempData.ContainsKey("siwe"))
+            {
+                msg = (string) TempData["siwe"];
+            }
 
-updateText(req.body.text, req.session.siwe.address);
-res.status(204).send().end();
-});
-          **/
+            if (msg == null)
+            {
+                return Unauthorized("You have to first sign-in.");
+            }
+
+            TempData["siwe"] = msg;
+
+            message.SaveText();
 
             return NoContent();
         }

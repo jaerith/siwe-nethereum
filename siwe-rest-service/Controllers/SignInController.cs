@@ -5,6 +5,7 @@
 using siwe;
 using siwe.Messages;
 
+using siwe_rest_service;
 using siwe_rest_service.Models;
 
 namespace siwe_rest_service.Controllers
@@ -68,7 +69,7 @@ namespace siwe_rest_service.Controllers
             TempData["siwe"] = message.ToMessage();
 
             SiweMessageAndText result =
-                new SiweMessageAndText() { Address = message.Address, Text = message.ToMessage(), Ens = String.Empty };
+                new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
 
             return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
         }
