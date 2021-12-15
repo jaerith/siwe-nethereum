@@ -7,6 +7,7 @@
 @using siwe.Messages
 @using siwe_nethereum.Data
 @using siwe_nethereum.RestServices
+@using siwe_rest_service.Models
 @inject IJSRuntime jsRuntime;
 @inject IEthereumHostProvider _ethereumHostProvider;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
@@ -157,12 +158,6 @@
         SelectedAccount       = account;
         BeforeSelectedAccount = false;
 
-        FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
-        if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
-        {
-            SampleText = await File.ReadAllTextAsync(textFile.FullName);
-        }
-
         this.StateHasChanged();
     }
 
@@ -212,7 +207,9 @@
 
             if (!String.IsNullOrEmpty(result.Address))
             {
-                BeforeSignedInWithEth = false;                       
+                BeforeSignedInWithEth = false;
+
+                SampleText = result.Text;
             }
             else
             {
@@ -231,7 +228,7 @@
 
         if (!String.IsNullOrEmpty(SelectedAccount) && !String.IsNullOrEmpty(SampleText))
         {
-            await File.WriteAllTextAsync("../db/" + SelectedAccount + ".txt", SampleText);          
+            await _siweRestService.PutSave(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText });
         }
 
         this.StateHasChanged();
