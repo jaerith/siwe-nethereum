@@ -4,6 +4,8 @@
 
 using siwe.Messages;
 
+using siwe_rest_service.Models;
+
 namespace siwe_rest_service.Controllers
 {
     [Route("api/[controller]")]
@@ -14,25 +16,27 @@ namespace siwe_rest_service.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
         {
-            SiweMeResult result =
-                new SiweMeResult() { Address = message.Address, Text = message.ToMessage(), Ens = String.Empty };
+            if ((message == null) || string.IsNullOrEmpty(message.Address))
+                return BadRequest();
 
-            /**
-             ** NOTE: To be ported
-             **
-    app.post('/api/sign_out', async (req, res) => {
-    if (!req.session.siwe)
-    {
-        res.status(401).json({ message: 'You have to first sign_in' });
-    return;
-}
+            string? msg = null;
 
-req.session.destroy(() => {
-    res.status(205).send();
-});
-             **/
+            if (TempData.ContainsKey("siwe"))
+            {
+                msg = (string) TempData["siwe"];
+            }
 
-            return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
+            if (msg == null)
+            {
+                return Unauthorized("You have to first sign-in.");
+            }
+
+            TempData["siwe"] = null;
+
+            SiweMessageAndText result =
+                new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
+
+            return StatusCode(205, result);
         }
     }
 }
