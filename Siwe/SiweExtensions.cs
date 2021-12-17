@@ -173,18 +173,65 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
 
         public const string REGEX_REQUESTID = @"[-._~!$&'()*+,;=:@%a-zA-Z0-9]*";
 
+        public static readonly string[] SIWE_CACHE_KEYS = new string[] { "siwe", "nonce", "ens" };
+
         public static void Ingest(this SiweMessage message, string siwePayload, bool bUseBNFParser = false)
 		{
 			// NOTE: Future implementation here
 		}
 
+        public static bool IsSiweCacheKey(string cacheKey)
+        {
+            return SIWE_CACHE_KEYS.Contains(cacheKey);
+        }
+
+        /// <summary>
+        /// 
+        /// Provides the default functionality associated with the SIWE signin in a Controller.
+        /// 
+        /// <param name="poOnixProduct">Refers to the current deserialized ONIX product being examined</param>
+        /// </summary>
+        public static void SiweSignIn(this SiweMessage message, Dictionary<string,string> tmpCache)
+        {
+            string? nonce = String.Empty;
+
+            if (message.Nonce == null)
+            {
+                // return BadRequest("Provided nonce is null");
+                throw new NoNonceException("Provided nonce is null!");
+            }
+
+            if (tmpCache.ContainsKey("nonce"))
+            {
+                nonce = tmpCache["nonce"];
+            }
+            /**
+             ** NOTE: To be addressed later, when dealing with ABNF
+             **
+            else if (!String.IsNullOrEmpty(HttpContext.Session.GetString("siwe")))
+            {
+                //
+                // NOTE: Get nonce from stored SIWE message
+                //
+                // nonce = HttpContext.Session.GetString("siwe");
+                //
+            }
+             **/
+
+            if ((message == null) || String.IsNullOrEmpty(message.Address) || String.IsNullOrEmpty(message.Signature))
+                throw new InvalidSiweDataException("Malformed session");
+
+            if (nonce != message.Nonce)
+                throw new InvalidSiweDataException("Invalid nonce");
+
+            message.Validate();
+
+            tmpCache["siwe"] = message.ToMessage();
+        }
+
         /**
-         * Validates the integrity of the fields of this objects by matching it's
+         * Validates the integrity of the fields of this object by matching its
          * signature.
-         * @param provider A Web3 provider able to perform a contract check, this is
-         * required if support for Smart Contract Wallets that implement EIP-1271 is
-         * needed.
-         * @returns {Task<SiweMessage>} This object if valid.
          */
         public static void Validate(this SiweMessage message)
         {
@@ -211,12 +258,8 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
         }
 
         /**
-         * Validates the integrity of the fields of this objects by matching it's
+         * Validates the integrity of the fields of this object by matching its
          * signature.
-         * @param provider A Web3 provider able to perform a contract check, this is
-         * required if support for Smart Contract Wallets that implement EIP-1271 is
-         * needed.
-         * @returns {Task<SiweMessage>} This object if valid.
          */
         public static async Task ValidateAsync(this SiweMessage message, IEthereumHostProvider provider = null)
         {
