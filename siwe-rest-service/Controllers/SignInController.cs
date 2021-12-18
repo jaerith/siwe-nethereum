@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 using siwe;
 using siwe.Messages;
 
-using siwe_rest_service;
 using siwe_rest_service.Models;
 
 namespace siwe_rest_service.Controllers
@@ -18,33 +15,28 @@ namespace siwe_rest_service.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
         {
-            string? nonce = String.Empty;
+            var tmpCache = new Dictionary<string, string>();
 
-            if (message.Nonce == null)
-                return BadRequest("Provided nonce is null");
-
-            if (TempData.ContainsKey("nonce"))
-            {
-                nonce = (string)TempData["nonce"];
-            }
-            else if (!String.IsNullOrEmpty(HttpContext.Session.GetString("siwe")))
-            {
-                /**
-                 ** NOTE: Get nonce from stored SIWE message
-                 **
-                nonce = HttpContext.Session.GetString("siwe");
-                 **/
-            }
-
-            if ((message == null) || String.IsNullOrEmpty(message.Address) || String.IsNullOrEmpty(message.Signature))
-                return UnprocessableEntity("Malformed session");
+            // NOTE: Extension method?
+            TempData.ToList().Where(x => (x.Value != null) && x.Value.GetType().Equals(typeof(string)))
+                    .ToList().ForEach(x => tmpCache[x.Key] = (string)x.Value);
 
             try
             {
-                if (nonce != message.Nonce)
-                    return UnprocessableEntity();
+                message.SiweSignIn(tmpCache);
 
-                message.Validate();
+                foreach (string key in tmpCache.Keys)
+                {
+                    TempData[key] = tmpCache[key];
+                }
+            }
+            catch (NoNonceException ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+            catch (InvalidDataException ex)
+            {
+                return UnprocessableEntity(ex.ToString());
             }
             catch (InvalidSignatureException ex)
             {
@@ -56,22 +48,21 @@ namespace siwe_rest_service.Controllers
             }
             finally
             {
-                HttpContext.Session.SetString("siwe",  string.Empty);
-                HttpContext.Session.SetString("ens",   string.Empty);
+                HttpContext.Session.SetString("siwe", string.Empty);
+                HttpContext.Session.SetString("ens", string.Empty);
                 HttpContext.Session.SetString("nonce", string.Empty);
             }
 
-            HttpContext.Session.SetString("siwe",  message.SignMessage());
-            HttpContext.Session.SetString("ens",   string.Empty);
+            HttpContext.Session.SetString("siwe", message.SignMessage());
+            HttpContext.Session.SetString("ens", string.Empty);
             HttpContext.Session.SetString("nonce", string.Empty);
             // req.session.cookie.expires = new Date(fields.expirationTime);?
-
-            TempData["siwe"] = message.ToMessage();
 
             SiweMessageAndText result =
                 new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
 
             return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
         }
+
     }
 }
