@@ -17,8 +17,7 @@ namespace siwe_rest_service.Controllers
         {
             var tmpCache = new Dictionary<string, string>();
 
-            // NOTE: Extension method?
-            TempData.ToList().Where(x => (x.Value != null) && x.Value.GetType().Equals(typeof(string)))
+            TempData.ToList().Where(x => x.IsSiweCacheKeyValue())
                     .ToList().ForEach(x => tmpCache[x.Key] = (string)x.Value);
 
             try
