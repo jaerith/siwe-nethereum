@@ -182,7 +182,14 @@ HEXDIG         =  DIGIT / ""A"" / ""B"" / ""C"" / ""D"" / ""E"" / ""F""
 
         public static bool IsSiweCacheKey(string cacheKey)
         {
-            return SIWE_CACHE_KEYS.Contains(cacheKey);
+            return (!String.IsNullOrEmpty(cacheKey) && SIWE_CACHE_KEYS.Contains(cacheKey));
+        }
+
+        public static bool IsSiweCacheKeyValue(this KeyValuePair<string, object?> cacheKeyVal)
+        {
+            return (IsSiweCacheKey(cacheKeyVal.Key) && 
+                    (cacheKeyVal.Value != null)     && 
+                    cacheKeyVal.Value.GetType().Equals(typeof(string)));
         }
 
         /// <summary>
