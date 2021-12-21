@@ -30,7 +30,12 @@
     <ProjectReference Include="..\Nethereum.Metamask.Blazor\Nethereum.Metamask.Blazor.csproj" />
     <ProjectReference Include="..\Nethereum.Metamask\Nethereum.Metamask.csproj" />
     <ProjectReference Include="..\siwe-rest-service\siwe-rest-service.csproj" />
-    <ProjectReference Include="..\Siwe\siwe.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Nethereum.Siwe.Core">
+      <HintPath>..\libs\Nethereum.Siwe.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

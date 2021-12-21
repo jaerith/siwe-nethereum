@@ -2,7 +2,7 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-using siwe.Messages;
+using Nethereum.Siwe.Core;
 
 using siwe_rest_service.Models;
 

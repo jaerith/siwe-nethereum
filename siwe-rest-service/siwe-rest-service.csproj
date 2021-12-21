@@ -15,4 +15,10 @@
     <ProjectReference Include="..\Siwe\siwe.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Nethereum.Siwe.Core">
+      <HintPath>..\libs\Nethereum.Siwe.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

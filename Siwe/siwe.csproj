@@ -10,11 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Parsers\" />
+    <ProjectReference Include="..\Nethereum.UI\Nethereum.UI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.UI\Nethereum.UI.csproj" />
+    <Reference Include="Nethereum.Siwe.Core">
+      <HintPath>..\libs\Nethereum.Siwe.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

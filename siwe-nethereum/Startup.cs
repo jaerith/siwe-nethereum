@@ -37,7 +37,6 @@ namespace siwe_nethereum
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<SiweService>();
             services.AddSingleton<SiweRestService>(new SiweRestService("https://localhost:7148/"));
             services.AddMudServices();
 

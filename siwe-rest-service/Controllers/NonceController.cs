@@ -2,7 +2,9 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-using siwe.Messages;
+using Nethereum.Siwe.Core;
+
+using siwe;
 
 namespace siwe_rest_service.Controllers
 {
@@ -13,10 +15,9 @@ namespace siwe_rest_service.Controllers
         [HttpGet()]
         public string GetNonce()
         {
-            string nonce = SiweMessage.GetNonce();
+            string nonce = new SiweMessage().GetNonce();
 
-            TempData["nonce"] = nonce;
-            // HttpContext.Session.SetString("nonce", nonce);
+            TempData["nonce"] = nonce;            
 
             return nonce;
         }

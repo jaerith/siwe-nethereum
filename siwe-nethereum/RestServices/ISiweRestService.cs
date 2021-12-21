@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 
+using Nethereum.Siwe.Core;
+
 using siwe.Messages;
 using siwe_rest_service.Models;
 

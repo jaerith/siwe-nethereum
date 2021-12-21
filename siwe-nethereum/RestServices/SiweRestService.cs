@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using Nethereum.Siwe.Core;
+
 using siwe.Messages;
 using siwe_rest_service.Models;
 

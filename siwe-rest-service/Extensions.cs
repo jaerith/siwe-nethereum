@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-using siwe.Messages;
+using Nethereum.Siwe.Core;
 
 using siwe_rest_service.Models;
 

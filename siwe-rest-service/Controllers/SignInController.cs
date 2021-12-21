@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using Nethereum.Siwe.Core;
+
 using siwe;
 using siwe.Messages;
 
@@ -55,6 +57,8 @@ namespace siwe_rest_service.Controllers
             HttpContext.Session.SetString("siwe", message.SignMessage());
             HttpContext.Session.SetString("ens", string.Empty);
             HttpContext.Session.SetString("nonce", string.Empty);
+
+            // NOTE: How to handle cookies still needs to be determined
             // req.session.cookie.expires = new Date(fields.expirationTime);?
 
             SiweMessageAndText result =

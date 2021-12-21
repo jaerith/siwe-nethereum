@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Nethereum.Siwe.Core; 
+
 namespace siwe.Messages
 {
     public record SessionData

@@ -4,6 +4,8 @@
 @using Nethereum.UI;
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
+@using Nethereum.Siwe.Core;
+@using siwe;
 @using siwe.Messages
 @using siwe_nethereum.Data
 @using siwe_nethereum.RestServices
@@ -15,48 +17,22 @@
 @using Nethereum.Web3;
 @using Nethereum.Hex.HexTypes;
 
+<h2>Notepad Example</h2>
+<br/>
+<br/>
+
 <MudItem xs="12" sm="6" md="3">
     <MudTextField @bind-Value="SelectedAccount" Label="Selected Account:" Style="width:100vh;" ReadOnly="true" Variant="Variant.Filled" />
 </MudItem>
 <MudSpacer />
 <MudGrid>
-    <!--<MudAvatar Disabled=@BeforeSignedInWithEth Image="assets/SIWE_Icon_Gradient.png" />-->
     <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE_Button.png"/></MudIconButton>
 </MudGrid>
 <MudSpacer />
 
-<!--
-<div class="card m-1">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-sm-6">
-            @if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
-             {
-                <small id="selectedAccountHelp" class="form-text text-muted">The selected account is bound to the host (ie Metamask) on change</small>
-             }
-             else
-             {
-                <small id="selectedAccountHelp" class="form-text text-muted">Select an account</small>
-             }
-            </div>
-        </div>
-    </div>
-</div>
--->
-
 <MudContainer Class="mt-16 px-8" Style="height:30vh;" MaxWidth="MaxWidth.False">
-    <!--
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="4">
-            <MudTextField Label="Message to Save" Variant="Variant.Outlined" @bind-Value="SampleText" Lines="10"/>
-        </MudItem>
-    </MudGrid>
-    -->
-    <!--
-    -->
     <MudSpacer />
     <MudGrid>
-    <br/>
     <textarea id="SaveText" name="Mesage to Save" rows="10" cols="100" @oninput="HandleOnChange">
     @SampleText
     </textarea>
@@ -68,26 +44,6 @@
         <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
     </MudGrid>
 </MudContainer>
-
-<!--
-@if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
-{
-    <MudSpacer/>
-    <br/>
-    <div class="card m-1">
-        <div class="card-body">
-            <div class="row">
-                <label class="col-sm-3 col-form-label-lg">Authentication by signing:</label>
-                <div class="col-sm-6">
-                    <button @onclick="@AuthenticateAsync">Authenticate</button>
-                    <div>@AuthenticatedAccount</div>
-                    <small id="selectedAccountHelp" class="form-text text-muted">Creating an unique challenge per authentication request, allows us to recover and validate what account has signed the message</small>
-                </div>
-            </div>
-        </div>
-    </div>
-}
--->
 
 @code {
 
@@ -193,10 +149,10 @@
                         , Uri = "https://localhost"
                         , Version = "1"
                         , Statement = "SIWE Notepad Example"
-                        , Type = SignatureType.PERSONAL_SIGNATURE
                         , Nonce = newNonce
                     };
 
+            message.IssuedAt       = DateTime.UtcNow.ToString("o");
             message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
 
             var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());

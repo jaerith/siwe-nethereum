@@ -1,4 +1,4 @@
-﻿using siwe.Messages;
+﻿using Nethereum.Siwe.Core;
 
 namespace siwe_rest_service.Models
 {
