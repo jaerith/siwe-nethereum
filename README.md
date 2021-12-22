@@ -3,6 +3,21 @@ A port of the [first SIWE example](https://github.com/spruceid/siwe) (i.e., Note
 
 Many thanks to Juan Blanco for the projects from his [Nethereum.Metamask.Blazor](https://github.com/Nethereum/Nethereum.Metamask.Blazor) repo and the [SIWE library](https://github.com/Nethereum/Nethereum/tree/master/src/Nethereum.Siwe.Core) currently in development.  None of this would have been possible without them!
 
+In order to properly run the sample, you should:
+1. Run two instances of Visual Studio 2022, opening the 'siwe-nethereum' project with one and the 'siwe-rest-service' project with the other.
+2. Start the 'siwe-rest-service' project.
+3. Start the 'siwe-nethereum' project.
+4. When the browser page for 'siwe-nethereum' pops up, navigate to "SIWE with Nethereum" on the left-hand navigation pane.  This page functions as the Notepad example.
+5. When at the Notepad screen, click on the "Connect Metamask" button at the top, which will trigger a login via Metamask.
+6. After the login with Metamask, click on the "Sign-In with Ethereum" button to start the SIWE process.  It will trigger Metamask, asking you to sign the EIP-191 payload before forwarding it to the SignIn REST controller.
+7. Once the SignIn REST controller has validated the payload, SIWE will be complete, and you can then use the Notepad example to save text (via the Save REST controller).
+
+NOTE: When running the 'siwe-nethereum' project, it assumes that the 'siwe-rest-service' is listening on local port 7148, as specified in Startup.cs:
+
+`services.AddSingleton<SiweRestService>(new SiweRestService("https://localhost:7148/"));`
+
+If the 'siwe-rest-service' starts on a different port when you run it, you'll have to change that respective line to the correct port.
+
 # Projects
 
 Project Source | Nuget_Package |  Description |
