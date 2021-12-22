@@ -26,4 +26,6 @@ Project Source | Nuget_Package |  Description |
 [siwe-nethereum](https://github.com/jaerith/siwe-nethereum/tree/main/siwe-nethereum) | | This Blazor UI project showcases how to interact with Metamask and how to use a SIWE login via the REST services (i.e., the Notepad example). |
 [siwe-rest-service](https://github.com/jaerith/siwe-nethereum/tree/main/siwe-rest-service)    | | This .NET 6 web api uses [Nethereum.Siwe.Core](https://github.com/Nethereum/Nethereum/tree/master/src/Nethereum.Siwe.Core) (and the local [Siwe](https://github.com/jaerith/siwe-nethereum/tree/main/Siwe) supplement) as an example of SIWE logins.  NOTE: In order to run the siwe-nethereum project, this service must be running prior. |
 
-![Screenshot 1](https://github.com/jaerith/siwe-nethereum/blob/main/Screenshots/SIWE_Nethereum_Screenshot_02.png)
+![Screenshot 1](https://github.com/jaerith/siwe-nethereum/blob/main/Screenshots/SIWE_Nethereum_Screenshot_01.png)
+![Screenshot 2](https://github.com/jaerith/siwe-nethereum/blob/main/Screenshots/SIWE_Nethereum_Screenshot_02.png)
+![Screenshot 3](https://github.com/jaerith/siwe-nethereum/blob/main/Screenshots/SIWE_Nethereum_Screenshot_03.png)
