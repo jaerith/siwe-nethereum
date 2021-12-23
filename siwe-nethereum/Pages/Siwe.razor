@@ -169,6 +169,8 @@
             }
             else
             {
+                BeforeSignedInWithEth = true;
+
                 await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
             }
         }
