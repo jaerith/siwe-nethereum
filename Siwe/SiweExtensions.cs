@@ -79,18 +79,6 @@ namespace siwe
             {
                 nonce = tmpCache["nonce"];
             }
-            /**
-             ** NOTE: To be addressed later, when dealing with ABNF
-             **
-            else if (!String.IsNullOrEmpty(HttpContext.Session.GetString("siwe")))
-            {
-                //
-                // NOTE: Get nonce from stored SIWE message
-                //
-                // nonce = HttpContext.Session.GetString("siwe");
-                //
-            }
-             **/
 
             if ((message == null) || String.IsNullOrEmpty(message.Address) || String.IsNullOrEmpty(message.Signature))
                 throw new InvalidSiweDataException("Malformed session");
