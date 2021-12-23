@@ -17,13 +17,13 @@ namespace siwe_rest_service.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
         {
-            var tmpCache = new Dictionary<string, string>();
-
-            TempData.ToList().Where(x => x.IsSiweCacheKeyValue())
-                    .ToList().ForEach(x => tmpCache[x.Key] = (string)x.Value);
-
             try
             {
+                var tmpCache = new Dictionary<string, string>();
+
+                TempData.ToList().Where(x => x.IsSiweCacheKeyValue())
+                        .ToList().ForEach(x => tmpCache[x.Key] = (string)x.Value);
+
                 message.SiweSignIn(tmpCache);
 
                 foreach (string key in tmpCache.Keys)
