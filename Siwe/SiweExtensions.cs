@@ -31,6 +31,36 @@ namespace siwe
             return nonce;
         }
 
+        public static void CheckDateRange(this SiweMessage message)
+        {
+            message.CheckExpirationDate();
+            message.CheckNotBeforeDate();
+        }
+
+        public static void CheckExpirationDate(this SiweMessage message)
+        {
+            if (!String.IsNullOrEmpty(message.ExpirationTime))
+            {
+                DateTime ExpireTime = DateTime.Parse(message.ExpirationTime);
+                if (DateTime.UtcNow.CompareTo(ExpireTime) > 0)
+                {
+                    throw new ExpiredMessageException();
+                }
+            }
+        }
+
+        public static void CheckNotBeforeDate(this SiweMessage message)
+        {
+            if (!String.IsNullOrEmpty(message.NotBefore))
+            {
+                DateTime NotBeforeTime = DateTime.Parse(message.NotBefore);
+                if (DateTime.UtcNow.CompareTo(NotBeforeTime) < 0)
+                {
+                    throw new NotBeforeException();
+                }
+            }
+        }
+
         public static void Ingest(this SiweMessage message, string siwePayload, bool bUseBNFParser = false)
 		{
 			// NOTE: Future implementation here
@@ -109,14 +139,7 @@ namespace siwe
                 throw new InvalidSignatureException();
             }
 
-            if (!String.IsNullOrEmpty(message.ExpirationTime))
-            {
-                DateTime currDateTime    = DateTime.Now;
-                DateTime expiredDateTime = DateTime.Parse(message.ExpirationTime);
-
-                if (currDateTime > expiredDateTime)
-                    throw new ExpiredMessageException();
-            }
+            message.CheckDateRange();
         }
 
         /**

@@ -47,6 +47,10 @@ namespace siwe_rest_service.Controllers
             {
                 return BadRequest("Expired Message -> \n" + ex.ToString());
             }
+            catch (NotBeforeException ex)
+            {
+                return BadRequest("Not Before Message -> \n" + ex.ToString());
+            }
             finally
             {
                 HttpContext.Session.SetString("siwe", string.Empty);
