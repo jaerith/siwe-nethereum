@@ -2,9 +2,11 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
+using Nethereum.Siwe.Core;
+
+using siwe;
 using siwe.Messages;
 
-using siwe_rest_service;
 using siwe_rest_service.Models;
 
 namespace siwe_rest_service.Controllers
@@ -30,6 +32,28 @@ namespace siwe_rest_service.Controllers
             if (msg == null)
             {
                 return Unauthorized("You have to first sign-in.");
+            }
+
+            var regexSiweMsg = SiweMessageParser.Parse(msg);
+            var abnfSiweMsg  = SiweMessageParser.ParseUsingAbnf(msg);
+
+            if (regexSiweMsg.Address != abnfSiweMsg.Address)
+            {
+                return UnprocessableEntity("ERROR!  Corrupted SIWE data in session.");
+            }
+
+            if (regexSiweMsg.Address != message.Address)
+            {
+                return UnprocessableEntity("ERROR!  Incorrect session associated with address.");
+            }
+
+            try
+            {
+                regexSiweMsg.CheckExpirationDate();
+            }
+            catch (ExpiredMessageException ex)
+            {
+                return Unauthorized("Expiration of session.  Requires another login via SIWE.");
             }
 
             TempData["siwe"] = msg;
