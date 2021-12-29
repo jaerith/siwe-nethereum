@@ -140,6 +140,10 @@ namespace siwe
             }
 
             message.CheckDateRange();
+
+            message.ValidateStatement();
+
+            message.ValidateUriAndResources();
         }
 
         /**
@@ -157,6 +161,44 @@ namespace siwe
             else
             {
                 Validate(message);
+            }
+        }
+
+        /**
+         * Validates the statement provided in the SiweMessage instance.
+         */
+        public static void ValidateStatement(this SiweMessage message)
+        {
+            if (String.IsNullOrEmpty(message.Statement))
+            {
+                throw new InvalidSiweDataException("Statement of SiweMessage is empty");
+            }
+
+            if (message.Statement.Contains('\n'))
+            {
+                throw new InvalidSiweDataException("Statement of SiweMessage contains newlines");
+            }
+        }
+
+        /**
+         * Validates the resources provided in the SiweMessage instance.
+         */
+        public static void ValidateUriAndResources(this SiweMessage message)
+        {
+            if (!Uri.IsWellFormedUriString(message.Uri, UriKind.RelativeOrAbsolute))
+            {
+                throw new InvalidSiweDataException("Uri (" + message.Uri + ") of SiweMessage is an invalid URI");
+            }
+
+            if (message.Resources?.Count > 0)
+            {
+                foreach (var resource in message.Resources)
+                {
+                    if (!String.IsNullOrEmpty(resource) && !Uri.IsWellFormedUriString(resource, UriKind.RelativeOrAbsolute))
+                    {
+                        throw new InvalidSiweDataException("Resource (" + resource + ") of SiweMessage is an invalid URI");
+                    }
+                }
             }
         }
 
