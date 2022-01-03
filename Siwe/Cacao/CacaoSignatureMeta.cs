@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace siwe.Cacao
 {
-    /**
-     ** NOTE: Implementation TBD
-     **/
+    /// <summary>
+    /// NOTE: Implementation TBD
+    /// </summary>
     public class CacaoSignatureMeta
     {
     }

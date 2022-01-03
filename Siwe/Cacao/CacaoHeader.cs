@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace siwe.Cacao
 {
-    /**
-     ** A sample implementation of the proposed chain-agnostic capability header, as mentioned in:
-     ** https://github.com/ChainAgnostic/CAIPs/pull/74
-     *
-     ** This class will someday be replaced by an official implementation in the Nethereum repo.
-     **
-     **/
+    /// <summary>
+    /// A sample implementation of the proposed chain-agnostic capability object, as mentioned in:
+    /// https://github.com/ChainAgnostic/CAIPs/pull/74
+    ///
+    /// This class will someday be replaced by an official implementation in the Nethereum repo.
+    ///
+    /// </summary>
     public class CacaoHeader
     {
         /// <summary>
