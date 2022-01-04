@@ -8,6 +8,23 @@ namespace siwe_rest_service
 {
     public static class Extensions
     {
+        public static DateTime ConvertToDateTime(string providedDateTime)
+        {
+            DateTime targetDateTime = DateTime.MinValue;
+
+            if (!String.IsNullOrEmpty(providedDateTime))
+            {
+                if (!DateTime.TryParse(providedDateTime, out targetDateTime))
+                    targetDateTime = DateTime.Now.AddMinutes(20);
+            }
+            else
+            {
+                targetDateTime = DateTime.Now.AddMinutes(20);
+            }
+
+            return targetDateTime;
+        }
+
         public static string GetText(this SiweMessage message)
         {
             string siweText = String.Empty;
