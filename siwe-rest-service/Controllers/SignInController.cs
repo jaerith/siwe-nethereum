@@ -7,12 +7,21 @@ using siwe.Messages;
 
 using siwe_rest_service.Models;
 
+using siwe_rest_service.Logic;
+
 namespace siwe_rest_service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class SignInController : Controller
     {
+        private readonly ITokenLogic _tokenLogic;
+
+        public SignInController(ITokenLogic tokenLogic)
+        {
+            _tokenLogic = tokenLogic;
+        }
+
         // POST api/<SignInController>
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
@@ -67,6 +76,8 @@ namespace siwe_rest_service.Controllers
 
             SiweMessageAndText result =
                 new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
+
+            result.Token = _tokenLogic.GetAuthenticationToken(message);
 
             return CreatedAtAction(nameof(Post), new { id = message.Address }, result);
         }

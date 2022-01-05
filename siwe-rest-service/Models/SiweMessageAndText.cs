@@ -8,17 +8,11 @@ namespace siwe_rest_service.Models
 
         public string? Ens { get; set; }
 
+        public string? Token { get; set; }
+
+        public string? ErrorMsg { get; set; }
+
         public SiweMessageAndText() : base()
         { }
-
-        public SiweMessageAndText(string unparsedMessage)
-        { 
-            // NOTE: Not yet implemented
-        }
-
-        public SiweMessageAndText(SiweMessage original)
-        { 
-            // NOTE: Not yet implemented
-        }
     }
 }
