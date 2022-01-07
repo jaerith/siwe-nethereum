@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,6 +17,7 @@ namespace siwe_rest_service.Controllers
     public class SaveController : Controller
     {
         // PUT api/<SaveController>/5
+        [Authorize]
         [HttpPut]
         public IActionResult Update([FromBody] SiweMessageAndText message)
         {

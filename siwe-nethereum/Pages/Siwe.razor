@@ -50,6 +50,7 @@
     [Inject] private IDialogService DialogService { get; set; }
 
     string SelectedAccount = String.Empty;
+    string JwtToken        = String.Empty;
 
     bool EthereumAvailable { get; set; }
     bool BeforeSelectedAccount {  get;  set; } 
@@ -70,13 +71,15 @@
             _ethereumHostProvider.SelectedAccountChanged += HostProvider_SelectedAccountChanged;
 
             EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
+            SelectedAccount   = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
 
-            SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
-
-            FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
-            if (!String.IsNullOrEmpty(SelectedAccount) && textFile.Exists)
+            if (!String.IsNullOrEmpty(SelectedAccount))
             {
-                SampleText = await File.ReadAllTextAsync(textFile.FullName);
+                BeforeSelectedAccount = false;
+
+                FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
+                if (textFile.Exists)
+                    SampleText = await File.ReadAllTextAsync(textFile.FullName);
             }
             else
             {
@@ -166,6 +169,7 @@
                 BeforeSignedInWithEth = false;
 
                 SampleText = result.Text;
+                JwtToken = result.Token;
             }
             else
             {
@@ -186,7 +190,13 @@
 
         if (!String.IsNullOrEmpty(SelectedAccount) && !String.IsNullOrEmpty(SampleText))
         {
-            await _siweRestService.PutSave(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText });
+            var ReturnedMsgAndText = 
+                await _siweRestService.PutSave(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText, Token = JwtToken });
+
+            if (!String.IsNullOrEmpty(ReturnedMsgAndText.ErrorMsg))
+            {
+                await DialogService.ShowMessageBox("Error", ReturnedMsgAndText.ErrorMsg, yesText: "Okay");
+            }
         }
 
         this.StateHasChanged();

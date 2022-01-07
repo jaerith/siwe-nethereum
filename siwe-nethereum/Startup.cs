@@ -47,6 +47,7 @@ namespace siwe_nethereum
             {
                 return serviceProvider.GetService<MetamaskHostProvider>();
             });
+
             services.AddScoped<IEthereumHostProvider, MetamaskHostProvider>();
             services.AddScoped<NethereumAuthenticator>();
             services.AddValidatorsFromAssemblyContaining<Nethereum.Erc20.Blazor.Erc20Transfer>();
@@ -77,6 +78,7 @@ namespace siwe_nethereum
                 endpoints.MapFallbackToPage("/_Host");
             });
 
+            app.UseAuthentication();
         }
     }
 }
