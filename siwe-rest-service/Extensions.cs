@@ -25,7 +25,7 @@ namespace siwe_rest_service
             return targetDateTime;
         }
 
-        public static string GetText(this SiweMessage message)
+        public static string GetNotepadText(this SiweMessage message)
         {
             string siweText = String.Empty;
 
@@ -42,7 +42,7 @@ namespace siwe_rest_service
             return siweText;
         }
 
-        public static async Task<string> GetTextAsync(this SiweMessage message)
+        public static async Task<string> GetNotepadTextAsync(this SiweMessage message)
         {
             string siweText = String.Empty;
 
@@ -59,7 +59,7 @@ namespace siwe_rest_service
             return siweText;
         }
 
-        public static void SaveText(this SiweMessageAndText message)
+        public static void SaveNotepadText(this SiweMessageAndText message)
         {
             DirectoryInfo dbDir = new DirectoryInfo("../db");
             if (!dbDir.Exists)
@@ -73,7 +73,7 @@ namespace siwe_rest_service
             }
         }
 
-        public static async void SaveTextAsync(this SiweMessageAndText message)
+        public static async void SaveNotepadTextAsync(this SiweMessageAndText message)
         {
             DirectoryInfo dbDir = new DirectoryInfo("../db");
             if (!dbDir.Exists)

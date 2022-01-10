@@ -34,7 +34,7 @@ namespace siwe_rest_service.Controllers
             TempData["siwe"] = null;
 
             SiweMessageAndText result =
-                new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
+                new SiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
 
             return StatusCode(205, result);
         }

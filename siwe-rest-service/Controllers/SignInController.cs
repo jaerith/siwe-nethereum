@@ -22,7 +22,17 @@ namespace siwe_rest_service.Controllers
             _tokenLogic = tokenLogic;
         }
 
-        // POST api/<SignInController>
+        [HttpGet()]
+        public SiweMessageAndText Get(string id)
+        {
+            SiweMessage message = new SiweMessage() { Address = id };
+
+            SiweMessageAndText result =
+                new SiweMessageAndText() { Address = id, Text = message.GetNotepadText(), Ens = String.Empty };
+
+            return result;
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody] SiweMessage message)
         {
@@ -75,7 +85,7 @@ namespace siwe_rest_service.Controllers
             // req.session.cookie.expires = new Date(fields.expirationTime);?
 
             SiweMessageAndText result =
-                new SiweMessageAndText() { Address = message.Address, Text = message.GetText(), Ens = String.Empty };
+                new SiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
 
             result.Token = _tokenLogic.GetAuthenticationToken(message);
 

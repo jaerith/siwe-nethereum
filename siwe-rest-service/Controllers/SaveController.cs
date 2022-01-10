@@ -26,41 +26,46 @@ namespace siwe_rest_service.Controllers
 
             string? msg = null;
 
+            // This conditional section is mostly demonstrative, in that it shows how the functionality
+            // offered by the Nethereum.Siwe.Core libraries 
             if (TempData.ContainsKey("siwe"))
             {
                 msg = (string) TempData["siwe"];
+
+                /**
+                 ** NOTE: No longer necessary, since we are using proper Authorization with the JWTs
+                if (msg == null)
+                {
+                    return Unauthorized("You have to first sign-in.");
+                }
+                 **/
+
+                var regexSiweMsg = SiweMessageParser.Parse(msg);
+                var abnfSiweMsg  = SiweMessageParser.ParseUsingAbnf(msg);
+
+                if (regexSiweMsg.Address != abnfSiweMsg.Address)
+                {
+                    return UnprocessableEntity("ERROR!  Corrupted SIWE data in session.");
+                }
+
+                if (regexSiweMsg.Address != message.Address)
+                {
+                    return UnprocessableEntity("ERROR!  Incorrect session associated with address.");
+                }
+
+                try
+                {
+                    regexSiweMsg.CheckExpirationDate();
+                }
+                catch (ExpiredMessageException ex)
+                {
+                    return Unauthorized("Expiration of session.  Requires another login via SIWE.");
+                }
+
+                TempData["siwe"] = msg;
             }
 
-            if (msg == null)
-            {
-                return Unauthorized("You have to first sign-in.");
-            }
-
-            var regexSiweMsg = SiweMessageParser.Parse(msg);
-            var abnfSiweMsg  = SiweMessageParser.ParseUsingAbnf(msg);
-
-            if (regexSiweMsg.Address != abnfSiweMsg.Address)
-            {
-                return UnprocessableEntity("ERROR!  Corrupted SIWE data in session.");
-            }
-
-            if (regexSiweMsg.Address != message.Address)
-            {
-                return UnprocessableEntity("ERROR!  Incorrect session associated with address.");
-            }
-
-            try
-            {
-                regexSiweMsg.CheckExpirationDate();
-            }
-            catch (ExpiredMessageException ex)
-            {
-                return Unauthorized("Expiration of session.  Requires another login via SIWE.");
-            }
-
-            TempData["siwe"] = msg;
-
-            message.SaveText();
+            message.SaveNotepadText();
 
             return NoContent();
         }
