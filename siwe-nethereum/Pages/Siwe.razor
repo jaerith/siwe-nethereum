@@ -5,6 +5,7 @@
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
 @using Nethereum.Siwe.Core;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using siwe;
 @using siwe.Messages
 @using siwe_nethereum.Data
@@ -12,6 +13,7 @@
 @using siwe_rest_service.Models
 @inject IJSRuntime jsRuntime;
 @inject IEthereumHostProvider _ethereumHostProvider;
+@inject ProtectedLocalStorage BrowserStorage;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
 @inject SiweRestService _siweRestService;
 @using Nethereum.Web3;
@@ -25,9 +27,10 @@
     <MudTextField @bind-Value="SelectedAccount" Label="Selected Account:" Style="width:100vh;" ReadOnly="true" Variant="Variant.Filled" />
 </MudItem>
 <MudSpacer />
-<MudGrid>
-    <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE-Button-Rounded-1x-Medium-Color-ColorIcon.png"/></MudIconButton>
-</MudGrid>
+<MudItem>
+    <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE-Button-Rounded-1x-Medium-Color-ColorIcon.png"/></MudIconButton>    
+    <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Filled.Logout" OnClick="SignOut" Variant="Variant.Filled" Color="Color.Primary" style="width:50px;height:50px;" />
+</MudItem>
 <MudSpacer />
 
 <MudContainer Class="mt-16 px-8" Style="height:30vh;" MaxWidth="MaxWidth.False">
@@ -48,6 +51,8 @@
 @code {
 
     [Inject] private IDialogService DialogService { get; set; }
+
+    private const string CONST_TOKEN_NAME = "SIWE_TKN";
 
     string SelectedAccount = String.Empty;
     string JwtToken        = String.Empty;
@@ -77,9 +82,16 @@
             {
                 BeforeSelectedAccount = false;
 
-                FileInfo textFile = new FileInfo("../db/" + SelectedAccount + ".txt");
-                if (textFile.Exists)
-                    SampleText = await File.ReadAllTextAsync(textFile.FullName);
+                await ReadStorage();
+
+                if (!String.IsNullOrEmpty(JwtToken))
+                {
+                    BeforeSignedInWithEth = false;
+
+                    var msgAndText = await _siweRestService.GetNotepadText(SelectedAccount);
+                    SampleText     = msgAndText.Text;
+                }
+
             }
             else
             {
@@ -132,6 +144,31 @@
         AuthenticatedAccount = await _nethereumAuthenticator.RequestNewChallengeSignatureAndRecoverAccountAsync();
     }
 
+    public async Task DeleteStorage()
+    {
+        await BrowserStorage.DeleteAsync(CONST_TOKEN_NAME);
+    }
+
+    public async Task ReadStorage()
+    {
+        var result = await BrowserStorage.GetAsync<string>(CONST_TOKEN_NAME);
+        JwtToken = result.Success ? result.Value : "";
+    }
+
+    public async Task SaveToStorage()
+    {
+        await BrowserStorage.SetAsync(CONST_TOKEN_NAME, JwtToken);
+    }
+
+    public async Task SignOut()
+    {        
+        await DeleteStorage();
+        await _siweRestService.PostSignOut(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText });
+
+        BeforeSignedInWithEth = true;
+        SampleText            = JwtToken = String.Empty;
+    }
+
     protected async Task SiweSignIn()
     {
         if (EthereumAvailable == true && !string.IsNullOrEmpty(SelectedAccount))
@@ -139,43 +176,56 @@
             // NOTE: Provider class does not yet implement ENS resolution
             var ENSAddress = String.Empty;
 
-            var newNonce = await _siweRestService.GetNonce();
-            if (newNonce.Contains("\""))
-                newNonce = newNonce.Replace("\"", string.Empty);
-
-            var message =
-                new SiweMessage()
-                    {
-                        Domain = "localhost"
-                        , Address = this.SelectedAccount
-                        , ChainId = this.ChainId
-                        , Uri = "https://localhost"
-                        , Version = "1"
-                        , Statement = "SIWE Notepad Example"
-                        , Nonce = newNonce
-                    };
-
-            message.IssuedAt       = DateTime.UtcNow.ToString("o");
-            message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
-
-            var signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
-
-            message.Signature = signature;
-
-            var result = await _siweRestService.PostSignIn(message);
-
-            if (!String.IsNullOrEmpty(result.Address))
+            if (String.IsNullOrEmpty(JwtToken))
             {
-                BeforeSignedInWithEth = false;
+                var newNonce = await _siweRestService.GetNonce();
+                if (newNonce.Contains("\""))
+                    newNonce = newNonce.Replace("\"", string.Empty);
 
-                SampleText = result.Text;
-                JwtToken = result.Token;
+                var message =
+                    new SiweMessage()
+                        {
+                            Domain = "localhost"
+                                ,
+                            Address = this.SelectedAccount
+                                ,
+                            ChainId = this.ChainId
+                                ,
+                            Uri = "https://localhost"
+                                ,
+                            Version = "1"
+                                ,
+                            Statement = "SIWE Notepad Example"
+                                ,
+                            Nonce = newNonce
+                        };
+
+                message.IssuedAt = DateTime.UtcNow.ToString("o");
+                message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
+                message.Signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
+
+                var result = await _siweRestService.PostSignIn(message);
+                if (!String.IsNullOrEmpty(result.Address))
+                {
+                    BeforeSignedInWithEth = false;
+
+                    SampleText = result.Text;
+                    JwtToken = result.Token;
+
+                    await SaveToStorage();
+                }
+                else
+                {
+                    BeforeSignedInWithEth = true;
+                    await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
+                }
             }
             else
             {
-                BeforeSignedInWithEth = true;
+                var msgAndText = await _siweRestService.GetNotepadText(SelectedAccount);
 
-                await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
+                BeforeSignedInWithEth = false;
+                SampleText = msgAndText.Text;
             }
         }
     }

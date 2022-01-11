@@ -47,6 +47,11 @@ namespace siwe_nethereum.RestServices
             return await httpClient.GetStringAsync(baseUrl + "api/nonce");
         }
 
+        public async Task<SiweMessageAndText> GetNotepadText(string address)
+        {
+            return await httpClient.GetFromJsonAsync<SiweMessageAndText>("api/signin?id=" + address);
+        }
+
         public async Task<SiweMessageAndText> PostSignIn(SiweMessage message)
         {
             var MsgWithText = new SiweMessageAndText();
