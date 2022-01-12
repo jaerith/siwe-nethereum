@@ -29,7 +29,9 @@
 <MudSpacer />
 <MudItem>
     <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE-Button-Rounded-1x-Medium-Color-ColorIcon.png"/></MudIconButton>    
-    <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Filled.Logout" OnClick="SignOut" Variant="Variant.Filled" Color="Color.Primary" style="width:50px;height:50px;" />
+    <MudTooltip Text="Sign Out">
+        <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Filled.Logout" OnClick="SignOut" Variant="Variant.Filled" Color="Color.Primary" style="width:50px;height:50px;" />
+    </MudTooltip>
 </MudItem>
 <MudSpacer />
 
@@ -44,7 +46,9 @@
 
 <MudContainer>
     <MudGrid>
-        <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
+        <MudTooltip Text="Save Text" Placement="Placement.Right">
+            <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Material.Filled.Save" OnClick="UpdateText" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" />
+        </MudTooltip>
     </MudGrid>
 </MudContainer>
 
