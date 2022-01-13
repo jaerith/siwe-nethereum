@@ -9,6 +9,7 @@ using Nethereum.Siwe.Core;
 using Nethereum.UI;
 
 using siwe.Base36;
+using siwe.Cacao;
 using siwe.Messages;
 
 namespace siwe
@@ -95,7 +96,7 @@ namespace siwe
         /// 
         /// <param name="poOnixProduct">Refers to the current deserialized ONIX product being examined</param>
         /// </summary>
-        public static void SiweSignIn(this SiweMessage message, Dictionary<string,string> tmpCache)
+        public static void SiweSignIn(this SiweMessage message, Dictionary<string,string> tmpCache, bool anchorFlag = true)
         {
             string? nonce = String.Empty;
 
@@ -119,6 +120,14 @@ namespace siwe
             message.Validate();
 
             tmpCache["siwe"] = SiweMessageStringBuilder.BuildMessage(message);
+
+            if (anchorFlag)
+            {
+                var CacaoMsg = message.ConvertToCacao();
+
+                // NOTE: To be implemented
+                // Anchor CACAO message to a decentralized storage location (like Ceramic)
+            }
         }
 
         /**
