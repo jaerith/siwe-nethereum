@@ -20,5 +20,12 @@ namespace siwe.Cacao
         public CacaoPayload Payload { get; set; }
         
         public CacaoSignature Signature { get; set; }
+
+        public CacaoMessage()
+        {
+            Header    = new CacaoHeader();
+            Payload   = new CacaoPayload();
+            Signature = new CacaoSignature();
+        }
     }
 }
