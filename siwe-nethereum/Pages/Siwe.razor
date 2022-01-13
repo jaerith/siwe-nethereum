@@ -38,7 +38,7 @@
 <MudContainer Class="mt-16 px-8" Style="height:30vh;" MaxWidth="MaxWidth.False">
     <MudSpacer />
     <MudGrid>
-    <textarea id="SaveText" name="Mesage to Save" rows="10" cols="100" @oninput="HandleOnChange">
+    <textarea id="SaveText" name="Mesage to Save" disabled="@BeforeSignedInWithEth" rows="10" cols="100" @oninput="HandleOnChange">
     @SampleText
     </textarea>
     </MudGrid>
@@ -190,23 +190,17 @@
                     new SiweMessage()
                         {
                             Domain = "localhost"
-                                ,
-                            Address = this.SelectedAccount
-                                ,
-                            ChainId = this.ChainId
-                                ,
-                            Uri = "https://localhost"
-                                ,
-                            Version = "1"
-                                ,
-                            Statement = "SIWE Notepad Example"
-                                ,
-                            Nonce = newNonce
+                            , Address = this.SelectedAccount
+                            , ChainId = this.ChainId
+                            , Uri = "https://localhost"
+                            , Version = "1"
+                            , Statement = "SIWE Notepad Example"
+                            , Nonce = newNonce
                         };
 
-                message.IssuedAt = DateTime.UtcNow.ToString("o");
+                message.IssuedAt       = DateTime.UtcNow.ToString("o");
                 message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
-                message.Signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
+                message.Signature      = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
 
                 var result = await _siweRestService.PostSignIn(message);
                 if (!String.IsNullOrEmpty(result.Address))
@@ -214,7 +208,7 @@
                     BeforeSignedInWithEth = false;
 
                     SampleText = result.Text;
-                    JwtToken = result.Token;
+                    JwtToken   = result.Token;
 
                     await SaveToStorage();
                 }
