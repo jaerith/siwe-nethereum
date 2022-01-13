@@ -123,9 +123,8 @@ namespace siwe
 
             if (anchorFlag)
             {
-                var CacaoMsg = message.ConvertToCacao();
-
                 // NOTE: To be implemented
+                // var CacaoMsg = message.ConvertToCacao();
                 // Anchor CACAO message to a decentralized storage location (like Ceramic)
             }
         }
