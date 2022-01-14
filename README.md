@@ -1,5 +1,5 @@
 # siwe-nethereum
-A port of the [first SIWE example](https://github.com/spruceid/siwe) (i.e., Notepad) that uses C# and [Nethereum](https://github.com/Nethereum/Nethereum).  In this example, the sign-in process uses the SIWE standard to gain authorization via the issuance of JWTs, which are then saved in the browser as local storage.  Examples of session storage are included, but they mainly exist for demonstrative purposes.
+A port of the [first SIWE example](https://github.com/spruceid/siwe) (i.e., Notepad) that uses C# and [Nethereum](https://github.com/Nethereum/Nethereum) to create a Blazor Server solution with a REST API backend.  In this example, the sign-in process uses the SIWE standard to gain authorization via the issuance of JWTs, which are then saved in the browser as local storage.  Examples of session storage are included, but they mainly exist for demonstrative purposes.
 
 Many thanks to Juan Blanco for the projects from his [Nethereum.Metamask.Blazor](https://github.com/Nethereum/Nethereum.Metamask.Blazor) repo and the [SIWE library](https://github.com/Nethereum/Nethereum/tree/master/src/Nethereum.Siwe.Core) currently in development.  None of this would have been possible without them!
 
