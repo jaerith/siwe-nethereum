@@ -22,6 +22,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.4.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="MudBlazor" Version="5.1.5" />
+    <PackageReference Include="Nethereum.ENS" Version="4.1.1" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 

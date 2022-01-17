@@ -1,7 +1,10 @@
 ﻿@page "/siwe"
 
 @using System.IO;
+@using Nethereum.ENS;
+@using Nethereum.Hex.HexTypes;
 @using Nethereum.UI;
+@using Nethereum.Web3;
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
 @using Nethereum.Siwe.Core;
@@ -16,8 +19,6 @@
 @inject ProtectedLocalStorage BrowserStorage;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
 @inject SiweRestService _siweRestService;
-@using Nethereum.Web3;
-@using Nethereum.Hex.HexTypes;
 
 <h2>Notepad Example</h2>
 <br/>
@@ -56,9 +57,12 @@
 
     [Inject] private IDialogService DialogService { get; set; }
 
+    private const string CONST_WEB3_URL   = "https://mainnet.infura.io/v3/ddd5ed15e8d443e295b696c0d07c8b02";
     private const string CONST_TOKEN_NAME = "SIWE_TKN";
 
     string SelectedAccount = String.Empty;
+    string EnsName         = String.Empty;
+    string EnsAvatar       = String.Empty;
     string JwtToken        = String.Empty;
 
     bool EthereumAvailable { get; set; }
@@ -66,7 +70,7 @@
     bool BeforeSignedInWithEth { get; set; }
     string ChainId { get; set; }
     string BlockHash { get; set; }
-    string SampleText { get; set;}
+    string SampleText { get; set; }
 
     protected string AuthenticatedAccount { get; set; }
 
@@ -120,6 +124,11 @@
              **/
 
             ChainId = "1";
+
+            if (String.IsNullOrEmpty(EnsName) || String.IsNullOrEmpty(EnsAvatar))
+            {
+                await RetrieveEnsData();
+            }
         }
     }
 
@@ -157,6 +166,24 @@
     {
         var result = await BrowserStorage.GetAsync<string>(CONST_TOKEN_NAME);
         JwtToken = result.Success ? result.Value : "";
+    }
+
+    public async Task RetrieveEnsData()
+    {
+        try
+        {
+            var web3       = new Web3(CONST_WEB3_URL);
+            var ensService = new ENSService(web3);
+
+            string sLookupAccount = SelectedAccount;
+            
+            EnsName   = await ensService.ReverseResolveAsync(sLookupAccount);
+            EnsAvatar = await ensService.ResolveTextAsync(EnsName, TextDataKey.avatar);
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine("ERROR!  Problem with retrieving ENS data:\n(" + ex + "\n)");
+        }
     }
 
     public async Task SaveToStorage()
