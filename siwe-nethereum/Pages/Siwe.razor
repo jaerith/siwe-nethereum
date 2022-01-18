@@ -27,6 +27,9 @@
 <MudItem xs="12" sm="6" md="3">
     <MudTextField @bind-Value="SelectedAccount" Label="Selected Account:" Style="width:100vh;" ReadOnly="true" Variant="Variant.Filled" />
 </MudItem>
+<MudItem xs="12" sm="6" md="3">
+    <MudTextField @bind-Value="EnsName" Label="ENS Name:" Style="width:100vh;" ReadOnly="true" Variant="Variant.Filled" />
+</MudItem>
 <MudSpacer />
 <MudItem>
     <MudIconButton OnClick="SiweSignIn" Disabled=@BeforeSelectedAccount Size="Size.Medium" Class="ma-2"><img src="assets/SIWE-Button-Rounded-1x-Medium-Color-ColorIcon.png"/></MudIconButton>    
@@ -34,12 +37,12 @@
         <MudIconButton Disabled=@BeforeSignedInWithEth Icon="@Icons.Filled.Logout" OnClick="SignOut" Variant="Variant.Filled" Color="Color.Primary" style="width:50px;height:50px;" />
     </MudTooltip>
 </MudItem>
-<MudSpacer />
 
-<MudContainer Class="mt-16 px-8" Style="height:30vh;" MaxWidth="MaxWidth.False">
+<MudContainer Class="mt-8 px-8" Style="height:24vh;" MaxWidth="MaxWidth.False">
+    <MudAvatar Image="@EnsAvatar" />
     <MudSpacer />
     <MudGrid>
-    <textarea id="SaveText" name="Mesage to Save" disabled="@BeforeSignedInWithEth" rows="10" cols="100" @oninput="HandleOnChange">
+    <textarea id="SaveText" name="Mesage to Save" disabled="@BeforeSignedInWithEth" rows="6" cols="100" @oninput="HandleOnChange">
     @SampleText
     </textarea>
     </MudGrid>
@@ -57,8 +60,9 @@
 
     [Inject] private IDialogService DialogService { get; set; }
 
-    private const string CONST_WEB3_URL   = "https://mainnet.infura.io/v3/ddd5ed15e8d443e295b696c0d07c8b02";
-    private const string CONST_TOKEN_NAME = "SIWE_TKN";
+    private const string CONST_WEB3_URL         = "https://mainnet.infura.io/v3/ddd5ed15e8d443e295b696c0d07c8b02";
+    private const string CONST_ENS_METADATA_URL = "https://metadata.ens.domains/mainnet/avatar/{0}/meta";
+    private const string CONST_TOKEN_NAME       = "SIWE_TKN";
 
     string SelectedAccount = String.Empty;
     string EnsName         = String.Empty;
@@ -128,6 +132,11 @@
             if (String.IsNullOrEmpty(EnsName) || String.IsNullOrEmpty(EnsAvatar))
             {
                 await RetrieveEnsData();
+
+                if (String.IsNullOrEmpty(EnsAvatar))
+                {
+                    EnsAvatar = "./favicon.ico";
+                }
             }
         }
     }
@@ -175,7 +184,7 @@
             var web3       = new Web3(CONST_WEB3_URL);
             var ensService = new ENSService(web3);
 
-            string sLookupAccount = SelectedAccount;
+            string sLookupAccount = SelectedAccount;            
             
             EnsName   = await ensService.ReverseResolveAsync(sLookupAccount);
             EnsAvatar = await ensService.ResolveTextAsync(EnsName, TextDataKey.avatar);
