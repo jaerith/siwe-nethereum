@@ -66,7 +66,8 @@
 
     string SelectedAccount = String.Empty;
     string EnsName         = String.Empty;
-    string EnsAvatar       = String.Empty;
+    string EnsUrl          = String.Empty;
+    string EnsAvatar       = "https://lh3.googleusercontent.com/hKHZTZSTmcznonu8I6xcVZio1IF76fq0XmcxnvUykC-FGuVJ75UPdLDlKJsfgVXH9wOSmkyHw0C39VAYtsGyxT7WNybjQ6s3fM3macE";
     string JwtToken        = String.Empty;
 
     bool EthereumAvailable { get; set; }
@@ -129,7 +130,7 @@
 
             ChainId = "1";
 
-            if (String.IsNullOrEmpty(EnsName) || String.IsNullOrEmpty(EnsAvatar))
+            if (String.IsNullOrEmpty(EnsName) || String.IsNullOrEmpty(EnsUrl))
             {
                 await RetrieveEnsData();
 
@@ -186,15 +187,15 @@
 
             string sLookupAccount = SelectedAccount;            
             
-            EnsName   = await ensService.ReverseResolveAsync(sLookupAccount);
-            EnsAvatar = await ensService.ResolveTextAsync(EnsName, TextDataKey.avatar);
+            EnsName = await ensService.ReverseResolveAsync(sLookupAccount);
+            EnsUrl  = await ensService.ResolveTextAsync(EnsName, TextDataKey.url);            
         }
         catch (Exception ex)
         {
             System.Console.WriteLine("ERROR!  Problem with retrieving ENS data:\n(" + ex + "\n)");
         }
     }
-
+    
     public async Task SaveToStorage()
     {
         await BrowserStorage.SetAsync(CONST_TOKEN_NAME, JwtToken);
