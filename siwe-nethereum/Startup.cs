@@ -6,10 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 using FluentValidation;
 using Nethereum.Metamask;
@@ -38,6 +34,7 @@ namespace siwe_nethereum
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<SiweRestService>(new SiweRestService("https://localhost:7148/"));
+            services.AddSingleton<EnsMetadataService>(new EnsMetadataService());
             services.AddMudServices();
 
             services.AddScoped<IMetamaskInterop, MetamaskBlazorInterop>();

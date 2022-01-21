@@ -1,10 +1,8 @@
 ﻿@page "/siwe"
 
 @using System.IO;
-@using Nethereum.ENS;
 @using Nethereum.Hex.HexTypes;
 @using Nethereum.UI;
-@using Nethereum.Web3;
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
 @using Nethereum.Siwe.Core;
@@ -19,6 +17,7 @@
 @inject ProtectedLocalStorage BrowserStorage;
 @inject NethereumAuthenticator  _nethereumAuthenticator;
 @inject SiweRestService _siweRestService;
+@inject EnsMetadataService _ensMetadataService;
 
 <h2>Notepad Example</h2>
 <br/>
@@ -39,7 +38,9 @@
 </MudItem>
 
 <MudContainer Class="mt-8 px-8" Style="height:24vh;" MaxWidth="MaxWidth.False">
-    <MudAvatar Image="@EnsAvatar" />
+    <MudBadge Color=@EnsBadgeColor Overlap="true" Bordered="true">
+        <MudAvatar Image="@EnsAvatar" />
+    </MudBadge>
     <MudSpacer />
     <MudGrid>
     <textarea id="SaveText" name="Mesage to Save" disabled="@BeforeSignedInWithEth" rows="6" cols="100" @oninput="HandleOnChange">
@@ -60,14 +61,13 @@
 
     [Inject] private IDialogService DialogService { get; set; }
 
-    private const string CONST_WEB3_URL         = "https://mainnet.infura.io/v3/ddd5ed15e8d443e295b696c0d07c8b02";
-    private const string CONST_ENS_METADATA_URL = "https://metadata.ens.domains/mainnet/avatar/{0}/meta";
-    private const string CONST_TOKEN_NAME       = "SIWE_TKN";
+    private const string CONST_TOKEN_NAME = "SIWE_TKN";
 
     string SelectedAccount = String.Empty;
     string EnsName         = String.Empty;
     string EnsUrl          = String.Empty;
-    string EnsAvatar       = "https://lh3.googleusercontent.com/hKHZTZSTmcznonu8I6xcVZio1IF76fq0XmcxnvUykC-FGuVJ75UPdLDlKJsfgVXH9wOSmkyHw0C39VAYtsGyxT7WNybjQ6s3fM3macE";
+    string EnsAvatar       = String.Empty;
+    Color  EnsBadgeColor   = Color.Warning;
     string JwtToken        = String.Empty;
 
     bool EthereumAvailable { get; set; }
@@ -101,6 +101,8 @@
                 {
                     BeforeSignedInWithEth = false;
 
+                    await RetrieveEnsData();
+
                     var msgAndText = await _siweRestService.GetNotepadText(SelectedAccount);
                     SampleText     = msgAndText.Text;
                 }
@@ -116,6 +118,14 @@
 
         if (!String.IsNullOrEmpty(SelectedAccount))
         {
+            if (BeforeSelectedAccount)
+            {
+                if (String.IsNullOrEmpty(EnsAvatar))
+                {
+                    await RetrieveEnsData();
+                }                
+            }
+
             BeforeSelectedAccount = false;
 
             /**
@@ -129,17 +139,8 @@
              **/
 
             ChainId = "1";
-
-            if (String.IsNullOrEmpty(EnsName) || String.IsNullOrEmpty(EnsUrl))
-            {
-                await RetrieveEnsData();
-
-                if (String.IsNullOrEmpty(EnsAvatar))
-                {
-                    EnsAvatar = "./favicon.ico";
-                }
-            }
         }
+
     }
 
     private async Task HandleOnChange(ChangeEventArgs args)
@@ -182,20 +183,35 @@
     {
         try
         {
-            var web3       = new Web3(CONST_WEB3_URL);
-            var ensService = new ENSService(web3);
-
             string sLookupAccount = SelectedAccount;            
-            
-            EnsName = await ensService.ReverseResolveAsync(sLookupAccount);
-            EnsUrl  = await ensService.ResolveTextAsync(EnsName, TextDataKey.url);            
+
+            EnsName = await _ensMetadataService.GetEnsName(sLookupAccount);
+            EnsUrl  = await _ensMetadataService.GetEnsUrl(EnsName);
         }
         catch (Exception ex)
         {
             System.Console.WriteLine("ERROR!  Problem with retrieving ENS data:\n(" + ex + "\n)");
         }
+
+        if (!BeforeSignedInWithEth)
+        {
+            EnsBadgeColor = Color.Success;
+        }
+        else
+        {
+            EnsBadgeColor = Color.Warning;
+        }
+
+        // EnsName   = "blahblahblah.eth";
+        // EnsAvatar = _ensMetadataService.GetEnsCacheAvatar("nick.eth");
+
+        EnsAvatar = _ensMetadataService.GetEnsCacheAvatar(EnsName);
+        if (String.IsNullOrEmpty(EnsAvatar))
+        {
+            EnsAvatar = "./favicon.ico";
+        }
     }
-    
+
     public async Task SaveToStorage()
     {
         await BrowserStorage.SetAsync(CONST_TOKEN_NAME, JwtToken);
@@ -237,22 +253,36 @@
 
                 message.IssuedAt       = DateTime.UtcNow.ToString("o");
                 message.ExpirationTime = DateTime.UtcNow.AddDays(1.0d).ToString("o");
-                message.Signature      = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
 
-                var result = await _siweRestService.PostSignIn(message);
-                if (!String.IsNullOrEmpty(result.Address))
+                try
                 {
-                    BeforeSignedInWithEth = false;
-
-                    SampleText = result.Text;
-                    JwtToken   = result.Token;
-
-                    await SaveToStorage();
+                    message.Signature = await _ethereumHostProvider.SignMessageAsync(message.SignMessage());
                 }
-                else
+                catch (Exception ex)
                 {
-                    BeforeSignedInWithEth = true;
-                    await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
+                    // NOTE: Simply ignoring this for now
+                }
+
+                if (!String.IsNullOrEmpty(message.Signature))
+                {
+                    var result = await _siweRestService.PostSignIn(message);
+                    if (!String.IsNullOrEmpty(result.Address))
+                    {
+                        BeforeSignedInWithEth = false;
+                        EnsBadgeColor         = Color.Success;
+
+                        SampleText = result.Text;
+                        JwtToken   = result.Token;
+
+                        await RetrieveEnsData();
+
+                        await SaveToStorage();
+                    }
+                    else
+                    {
+                        BeforeSignedInWithEth = true;
+                        await DialogService.ShowMessageBox("Error", "Sign In with Ethereum failed.", yesText: "Okay");
+                    }
                 }
             }
             else
