@@ -3,6 +3,8 @@ A port of the [first SIWE example](https://github.com/spruceid/siwe) (i.e., Note
 
 Many thanks to Juan Blanco for the projects from his [Nethereum.Metamask.Blazor](https://github.com/Nethereum/Nethereum.Metamask.Blazor) repo and the [SIWE library](https://github.com/Nethereum/Nethereum/tree/master/src/Nethereum.Siwe.Core) currently in development.  None of this would have been possible without them!
 
+![Screenshot](Screenshots/SiweNethereumWalkthrough.gif)
+
 ## Projects
 
 Project Source | Nuget_Package |  Description |
