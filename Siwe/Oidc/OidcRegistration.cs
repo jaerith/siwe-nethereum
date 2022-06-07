@@ -1,4 +1,6 @@
-﻿namespace siwe_rest_service.Models
+﻿using System.Collections.Generic;
+
+namespace siwe.Oidc
 {
     public class OidcRegistration
     {
