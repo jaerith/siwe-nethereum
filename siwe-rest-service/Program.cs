@@ -20,6 +20,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<ITokenLogic, TokenLogic>();
 
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+builder.Services.Configure<OidcSettings>(builder.Configuration.GetSection("OidcSettings"));
 
 builder.Services
        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
