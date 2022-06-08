@@ -13,5 +13,7 @@ namespace siwe.Oidc
         public string? registration_client_uri { get; set; }
 
         public List<string>? redirect_uris { get; set; }
+
+        public OidcConfiguration? configuration { get; set; }
     }
 }
