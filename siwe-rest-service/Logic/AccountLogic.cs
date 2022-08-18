@@ -10,8 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 
 using Nethereum.Siwe.Core;
 
-using siwe_rest_service.Models;
-
 namespace siwe_rest_service.Logic
 {
     public class TokenLogic : ITokenLogic
