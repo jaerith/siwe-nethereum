@@ -1,8 +1,10 @@
 ﻿using Nethereum.Siwe.Core;
 
+using siwe.Messages;
+
 namespace siwe_rest_service.Models
 {
-    public class SiweMessageAndText : SiweMessage
+    public class MySiweMessageAndText : MySiweMessage
     {
         public string? Text { get; set; }
 
@@ -12,7 +14,7 @@ namespace siwe_rest_service.Models
 
         public string? ErrorMsg { get; set; }
 
-        public SiweMessageAndText() : base()
+        public MySiweMessageAndText() : base()
         { }
     }
 }

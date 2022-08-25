@@ -19,7 +19,7 @@ namespace siwe_rest_service.Controllers
         // PUT api/<SaveController>/5
         [Authorize]
         [HttpPut]
-        public IActionResult Update([FromBody] SiweMessageAndText message)
+        public IActionResult Update([FromBody] MySiweMessageAndText message)
         {
             if ((message == null) || string.IsNullOrEmpty(message.Address))
                 return BadRequest();

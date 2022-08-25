@@ -47,29 +47,29 @@ namespace siwe_nethereum.RestServices
             return await httpClient.GetStringAsync(baseUrl + "api/nonce");
         }
 
-        public async Task<SiweMessageAndText> GetNotepadText(string address)
+        public async Task<MySiweMessageAndText> GetNotepadText(string address)
         {
-            return await httpClient.GetFromJsonAsync<SiweMessageAndText>("api/signin?id=" + address);
+            return await httpClient.GetFromJsonAsync<MySiweMessageAndText>("api/signin?id=" + address);
         }
 
-        public async Task<SiweMessageAndText> PostSignIn(SiweMessage message)
+        public async Task<MySiweMessageAndText> PostSignIn(MySiweMessage message)
         {
-            var MsgWithText = new SiweMessageAndText();
-            var response    = await httpClient.PostAsJsonAsync<SiweMessage>("api/signin", message);
+            var MsgWithText = new MySiweMessageAndText();
+            var response    = await httpClient.PostAsJsonAsync<MySiweMessage>("api/signin", message);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                MsgWithText = JsonConvert.DeserializeObject<SiweMessageAndText>(responseContent);
+                MsgWithText = JsonConvert.DeserializeObject<MySiweMessageAndText>(responseContent);
             }
 
             return MsgWithText;
         }
 
-        public async Task<SiweMeResult> PostSignOut(SiweMessage message)
+        public async Task<SiweMeResult> PostSignOut(MySiweMessage message)
         {
             var meResult = new SiweMeResult();
-            var response = await httpClient.PostAsJsonAsync<SiweMessage>("api/signout", message);
+            var response = await httpClient.PostAsJsonAsync<MySiweMessage>("api/signout", message);
 
             if (response.IsSuccessStatusCode)
             {
@@ -80,14 +80,14 @@ namespace siwe_nethereum.RestServices
             return meResult;
         }
 
-        public async Task<SiweMessageAndText> PutSave(SiweMessageAndText message)
+        public async Task<MySiweMessageAndText> PutSave(MySiweMessageAndText message)
         {
-            var MsgWithText = new SiweMessageAndText();
+            var MsgWithText = new MySiweMessageAndText();
 
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", message.Token);
 
-            var response = await httpClient.PutAsJsonAsync<SiweMessageAndText>("api/save", message);
+            var response = await httpClient.PutAsJsonAsync<MySiweMessageAndText>("api/save", message);
             if (!response.IsSuccessStatusCode)
             {
                 MsgWithText.Address  = message.Address;

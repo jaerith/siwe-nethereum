@@ -96,7 +96,7 @@ namespace siwe
         /// 
         /// <param name="poOnixProduct">Refers to the current deserialized ONIX product being examined</param>
         /// </summary>
-        public static void SiweSignIn(this SiweMessage message, Dictionary<string,string> tmpCache, bool anchorFlag = true)
+        public static void SiweSignIn(this MySiweMessage message, Dictionary<string,string> tmpCache, bool anchorFlag = true)
         {
             string? nonce = String.Empty;
 
@@ -133,7 +133,7 @@ namespace siwe
          * Validates the integrity of the fields of this object by matching its
          * signature.
          */
-        public static void Validate(this SiweMessage message)
+        public static void Validate(this MySiweMessage message)
         {
             string messageBody = SiweMessageStringBuilder.BuildMessage(message);
 
@@ -158,7 +158,7 @@ namespace siwe
          * Validates the integrity of the fields of this object by matching its
          * signature.
          */
-        public static async Task ValidateAsync(this SiweMessage message, IEthereumHostProvider provider = null)
+        public static async Task ValidateAsync(this MySiweMessage message, IEthereumHostProvider provider = null)
         {
             if (provider != null)
             {
@@ -173,29 +173,29 @@ namespace siwe
         }
 
         /**
-         * Validates the statement provided in the SiweMessage instance.
+         * Validates the statement provided in the MySiweMessage instance.
          */
         public static void ValidateStatement(this SiweMessage message)
         {
             if (String.IsNullOrEmpty(message.Statement))
             {
-                throw new InvalidSiweDataException("Statement of SiweMessage is empty");
+                throw new InvalidSiweDataException("Statement of MySiweMessage is empty");
             }
 
             if (message.Statement.Contains('\n'))
             {
-                throw new InvalidSiweDataException("Statement of SiweMessage contains newlines");
+                throw new InvalidSiweDataException("Statement of MySiweMessage contains newlines");
             }
         }
 
         /**
-         * Validates the resources provided in the SiweMessage instance.
+         * Validates the resources provided in the MySiweMessage instance.
          */
         public static void ValidateUriAndResources(this SiweMessage message)
         {
             if (!Uri.IsWellFormedUriString(message.Uri, UriKind.RelativeOrAbsolute))
             {
-                throw new InvalidSiweDataException("Uri (" + message.Uri + ") of SiweMessage is an invalid URI");
+                throw new InvalidSiweDataException("Uri (" + message.Uri + ") of MySiweMessage is an invalid URI");
             }
 
             if (message.Resources?.Count > 0)
@@ -204,7 +204,7 @@ namespace siwe
                 {
                     if (!String.IsNullOrEmpty(resource) && !Uri.IsWellFormedUriString(resource, UriKind.RelativeOrAbsolute))
                     {
-                        throw new InvalidSiweDataException("Resource (" + resource + ") of SiweMessage is an invalid URI");
+                        throw new InvalidSiweDataException("Resource (" + resource + ") of MySiweMessage is an invalid URI");
                     }
                 }
             }

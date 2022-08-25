@@ -6,6 +6,7 @@
 @using Nethereum.Metamask;
 @using Nethereum.Erc20.Blazor;
 @using Nethereum.Siwe.Core;
+@using Nethereum.Util;
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using siwe;
 @using siwe.Messages
@@ -217,7 +218,7 @@
     public async Task SignOut()
     {        
         await DeleteStorage();
-        await _siweRestService.PostSignOut(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText });
+        await _siweRestService.PostSignOut(new MySiweMessageAndText() { Address = SelectedAccount, Text = SampleText });
 
         BeforeSignedInWithEth = true;
         SampleText            = JwtToken = String.Empty;
@@ -237,10 +238,10 @@
                     newNonce = newNonce.Replace("\"", string.Empty);
 
                 var message =
-                    new SiweMessage()
+                    new MySiweMessage()
                         {
                             Domain = "localhost"
-                            , Address = this.SelectedAccount
+                            , Address = this.SelectedAccount.ConvertToEthereumChecksumAddress()
                             , ChainId = this.ChainId
                             , Uri = "https://localhost"
                             , Version = "1"
@@ -303,7 +304,7 @@
         if (!String.IsNullOrEmpty(SelectedAccount) && !String.IsNullOrEmpty(SampleText))
         {
             var ReturnedMsgAndText = 
-                await _siweRestService.PutSave(new SiweMessageAndText() { Address = SelectedAccount, Text = SampleText, Token = JwtToken });
+                await _siweRestService.PutSave(new MySiweMessageAndText() { Address = SelectedAccount, Text = SampleText, Token = JwtToken });
 
             if (!String.IsNullOrEmpty(ReturnedMsgAndText.ErrorMsg))
             {

@@ -5,6 +5,7 @@
 using Nethereum.Siwe.Core;
 
 using siwe;
+using siwe.Messages;
 
 namespace siwe_rest_service.Controllers
 {
@@ -15,7 +16,7 @@ namespace siwe_rest_service.Controllers
         [HttpGet()]
         public string GetNonce()
         {
-            string nonce = new SiweMessage().GetNonce();
+            string nonce = new MySiweMessage().GetNonce();
 
             TempData["nonce"] = nonce;            
 

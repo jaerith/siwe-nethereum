@@ -23,18 +23,18 @@ namespace siwe_rest_service.Controllers
         }
 
         [HttpGet()]
-        public SiweMessageAndText Get(string id)
+        public MySiweMessageAndText Get(string id)
         {
-            SiweMessage message = new SiweMessage() { Address = id };
+            MySiweMessage message = new MySiweMessage() { Address = id };
 
-            SiweMessageAndText result =
-                new SiweMessageAndText() { Address = id, Text = message.GetNotepadText(), Ens = String.Empty };
+            MySiweMessageAndText result =
+                new MySiweMessageAndText() { Address = id, Text = message.GetNotepadText(), Ens = String.Empty };
 
             return result;
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] SiweMessage message)
+        public IActionResult Post([FromBody] MySiweMessage message)
         {
             try
             {
@@ -84,8 +84,8 @@ namespace siwe_rest_service.Controllers
             // NOTE: How to handle cookies still needs to be determined
             // req.session.cookie.expires = new Date(fields.expirationTime);?
 
-            SiweMessageAndText result =
-                new SiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
+            MySiweMessageAndText result =
+                new MySiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
 
             result.Token = _tokenLogic.GetAuthenticationToken(message);
 

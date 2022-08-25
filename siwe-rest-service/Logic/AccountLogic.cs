@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 
 using Nethereum.Siwe.Core;
 
+using siwe.Messages;
+
 namespace siwe_rest_service.Logic
 {
     public class TokenLogic : ITokenLogic
@@ -21,7 +23,7 @@ namespace siwe_rest_service.Logic
             _tokenSettings = tokenSettings.Value;
         }
 
-        public string GetAuthenticationToken(SiweMessage loginMsg)
+        public string GetAuthenticationToken(MySiweMessage loginMsg)
         {
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.Key));
             var credentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);

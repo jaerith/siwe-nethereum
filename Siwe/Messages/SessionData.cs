@@ -10,7 +10,7 @@ namespace siwe.Messages
 {
     public record SessionData
     {
-        public SiweMessage? Siwe { get; init; }
+        public MySiweMessage? Siwe { get; init; }
 
         public string? Nonce { get; init; }
 

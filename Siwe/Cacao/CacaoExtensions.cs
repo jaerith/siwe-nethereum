@@ -19,7 +19,7 @@ namespace siwe.Cacao
         /// Converts SIWE message to CACAO object, as mentioned in:
         /// https://github.com/ChainAgnostic/CAIPs/pull/74
         /// </summary>
-        public static CacaoMessage ConvertToCacao(this SiweMessage msg)
+        public static CacaoMessage ConvertToCacao(this MySiweMessage msg)
         {
             CacaoMessage cacaoMsg = new CacaoMessage();
 
@@ -84,9 +84,9 @@ namespace siwe.Cacao
         /// <summary>
         /// Converts CACAO object (as mentioned in https://github.com/ChainAgnostic/CAIPs/pull/74to) to SIWE message
         /// </summary>
-        public static SiweMessage ConvertToSiwe(this CacaoMessage msg)
+        public static MySiweMessage ConvertToSiwe(this CacaoMessage msg)
         {
-            SiweMessage siweMsg = new SiweMessage();
+            MySiweMessage siweMsg = new MySiweMessage();
 
             if (!String.IsNullOrEmpty(msg.Payload?.Domain))
             {

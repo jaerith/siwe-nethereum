@@ -4,6 +4,8 @@
 
 using Nethereum.Siwe.Core;
 
+using siwe.Messages;
+
 using siwe_rest_service.Models;
 
 namespace siwe_rest_service.Controllers
@@ -14,7 +16,7 @@ namespace siwe_rest_service.Controllers
     {
         // POST api/<SignOutController>
         [HttpPost]
-        public IActionResult Post([FromBody] SiweMessage message)
+        public IActionResult Post([FromBody] MySiweMessage message)
         {
             if ((message == null) || string.IsNullOrEmpty(message.Address))
                 return BadRequest();
@@ -33,8 +35,8 @@ namespace siwe_rest_service.Controllers
 
             TempData["siwe"] = null;
 
-            SiweMessageAndText result =
-                new SiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
+            MySiweMessageAndText result =
+                new MySiweMessageAndText() { Address = message.Address, Text = message.GetNotepadText(), Ens = String.Empty };
 
             return StatusCode(205, result);
         }

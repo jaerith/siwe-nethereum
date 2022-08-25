@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nethereum.Signer" Version="4.1.1" />
-    <PackageReference Include="Nethereum.Siwe.Core" Version="4.2.0" />
+    <PackageReference Include="Nethereum.Signer" Version="4.8.0" />
+    <PackageReference Include="Nethereum.Siwe.Core" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -13,12 +13,12 @@ namespace siwe_nethereum.RestServices
 
         public Task<string> GetNonce();
 
-        public Task<SiweMessageAndText> GetNotepadText(string address);
+        public Task<MySiweMessageAndText> GetNotepadText(string address);
 
-        public Task<SiweMessageAndText> PostSignIn(SiweMessage message);
+        public Task<MySiweMessageAndText> PostSignIn(MySiweMessage message);
 
-        public Task<SiweMeResult> PostSignOut(SiweMessage message);
+        public Task<SiweMeResult> PostSignOut(MySiweMessage message);
 
-        public Task<SiweMessageAndText> PutSave(SiweMessageAndText message);
+        public Task<MySiweMessageAndText> PutSave(MySiweMessageAndText message);
     }
 }
