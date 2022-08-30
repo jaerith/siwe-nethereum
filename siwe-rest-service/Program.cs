@@ -17,8 +17,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSingleton<SignDocumentLogic>();
 builder.Services.AddScoped<ITokenLogic, TokenLogic>();
 
+builder.Services.Configure<EthereumSettings>(builder.Configuration.GetSection("EthereumSettings"));
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 builder.Services.Configure<OidcSettings>(builder.Configuration.GetSection("OidcSettings"));
 
