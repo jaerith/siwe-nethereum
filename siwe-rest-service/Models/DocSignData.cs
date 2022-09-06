@@ -2,6 +2,8 @@
 {
     public class DocSignData
     {
+        public string? DocName { get; set; }
+
         public string? DocumentHash { get; set; }
 
         public ushort? DocId { get; set; }
