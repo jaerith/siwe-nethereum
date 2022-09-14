@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
@@ -14,11 +9,10 @@ using Nethereum.Contracts.ContractHandlers;
 using Nethereum.Contracts.CQS;
 using Nethereum.Contracts.Extensions;
 using Nethereum.Hex.HexConvertors.Extensions;
+using Nethereum.UI;
+using Nethereum.Util;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
-using Nethereum.Util;
-
-using Nethereum.Siwe.Core;
 
 using siwe_rest_service.Logic.ERC5289;
 
@@ -26,7 +20,7 @@ namespace siwe_rest_service.Logic
 {
     public class SignDocumentLogic : ISignDocumentLogic
     {
-        private readonly EthereumSettings _ethereumSettings;
+        private readonly EthereumSettings? _ethereumSettings;
 
         private readonly String          _address;
         private readonly Web3            _web3;
@@ -40,6 +34,23 @@ namespace siwe_rest_service.Logic
 
             _address = account.Address;
             _web3    = new Web3(account, _ethereumSettings.Url);
+
+            var eRC5289LibraryDeployment = new ERC5289LibraryDeployment();
+
+            var transactionReceiptDeployment =
+                _web3.Eth.GetContractDeploymentHandler<ERC5289LibraryDeployment>().SendRequestAndWaitForReceiptAsync(eRC5289LibraryDeployment).Result;
+
+            var contractAddress = transactionReceiptDeployment.ContractAddress;
+
+            _signDocContractHandler = _web3.Eth.GetContractHandler(contractAddress);
+        }
+
+        public SignDocumentLogic(IEthereumHostProvider hostProvider)
+        {
+            _ethereumSettings = null;
+            _address          = String.Empty;
+
+            _web3 = hostProvider.GetWeb3Async().Result;
 
             var eRC5289LibraryDeployment = new ERC5289LibraryDeployment();
 
